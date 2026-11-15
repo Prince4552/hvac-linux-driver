@@ -14,8 +14,8 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 1 | Platform (Buildroot + QEMU + autotest) | done | `make test-all`: host lint clean, guest 34/34, 0 skipped | `phase 1: Platform` / `phase-1` |
 | 2 | Driver skeleton and hello module | done | `make test-all`: host lint clean, guest 40/40, 0 skipped | `phase 2: Driver skeleton and hello module` / `phase-2` |
 | 3 | Complete driver (IIO, conversion, alarms, KUnit) | done | `make test-all`: host lint clean, guest 83/83, 0 skipped | `phase 3: Complete driver` / `phase-3` |
-| 4 | Driver hardening (robustness, memory, static analysis, mutation) | in progress | | |
-| 5 | Thermostat control core and simulation | not started | | |
+| 4 | Driver hardening (robustness, memory, static analysis, mutation) | done | `make test-all && make mutation`: lint + static clean, guest 90/90, 0 skipped, mutation 3/3 | `phase 4: Driver hardening` / `phase-4` |
+| 5 | Thermostat control core and simulation | in progress | | |
 | 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | not started | | |
 | 7 | CI, metrics, documentation, publishing (v1.0.0) | not started | | |
 | Ext 1 | Watchdog supervision | not started | | |
@@ -27,17 +27,15 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 4 (Driver hardening)
+Phase: 5 (Thermostat control core and simulation)
 
-Phase 3 task checklist (done):
+Phase 4 task checklist (done):
 
-- [x] `driver/hvac_temp_conv.h` exactly as plan 4.3
-- [x] IIO channel, `read_raw` (RAW under mutex, SCALE constant), `devm_iio_device_register`
-- [x] `driver/hvac_temp_alarm.c` (two attributes via IIO attrs group, under the mutex)
-- [x] `driver/hvac_temp_kunit.c` (suite `hvac_temp_conv`, 5 cases), separate module
-- [x] Tests: conversion (12), attributes (5), alarms (25), KUnit (1); D-016, D-017
-- [x] Read-error path limitation documented (D-018)
-- [x] Gate `make test-all`; learning note `docs/phases/phase-03-complete-driver.md`
+- [x] `test_driver_robustness.py`: concurrent reads, reads + writes, 500 load/unload cycles, remove while reading
+- [x] `test_memory.py`: kmemleak (200 cycles), KASAN/lockdep silent, read latency
+- [x] `scripts/static_analysis.sh` (checkpatch + sparse, both proven to detect planted bugs), called by `make test-qemu`
+- [x] Mutants 01-03 + `scripts/run_mutation.sh` (`make mutation`), score 3/3; no-mutex rationale D-020
+- [x] Gate; learning note `docs/phases/phase-04-driver-hardening.md`; D-019, D-020
 
 Work prepared ahead (not committed yet, belongs to later phases): Phase 2/3/4 driver code and tests
 staged; `thermostat/` core, config, simulator and unit tests (Phase 5); daemon modules, Modbus client and
@@ -59,6 +57,8 @@ log file path, what you need from the user.)
   guest 34/34.
 - Phase 2: guest 40/40; 50 bind cycles in 13 s.
 - Phase 3: guest 83/83; KUnit 5/5 cases (`kunit_cases_passed` = 5).
+- Phase 4: guest 90/90; kmemleak/KASAN/lockdep reports 0/0/0; concurrent read errors 0; 500 load/unload
+  cycles; checkpatch 0/0, sparse 0; mutation 3/3; read latency median ~1.1 ms (emulated).
 
 ## Publishing
 

@@ -1,0 +1,11 @@
+--- a/driver/hvac_temp_alarm.c	2026-11-15 19:32:28.498195639 +0000
++++ b/driver/hvac_temp_alarm.c	2026-11-15 19:32:28.510195637 +0000
+@@ -48,8 +48,6 @@
+ 	/* Any unparsable input (including overflow, which kstrtoint reports as -ERANGE) is -EINVAL. */
+ 	if (kstrtoint(buf, 10, &mc))
+ 		return -EINVAL;
+-	if (mc < HVAC_TEMP_MIN_MC || mc > HVAC_TEMP_MAX_MC)
+-		return -EINVAL;
+ 
+ 	reg_val = hvac_temp_raw_to_reg(hvac_temp_mc_to_raw(mc));
+ 	mutex_lock(&data->lock);

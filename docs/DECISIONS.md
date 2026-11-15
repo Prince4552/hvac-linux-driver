@@ -205,3 +205,30 @@ Format (newest at the bottom):
 - Alternatives considered: a fault-injecting fake I2C adapter module (more kernel code to maintain and
   review than the path it would test).
 - Consequences: listed under limitations in the technical report.
+
+## D-019: No checkpatch warning types need to be allowed
+- Date / phase: 2026-11-15, Phase 4
+- Context: the plan expects some checkpatch warnings to be allowed (for example the undocumented
+  device-tree compatible) and listed here.
+- Decision: `ALLOWED_TYPES` in `scripts/static_analysis.sh` is empty. checkpatch 6.18 reports 0 errors and
+  0 warnings for every `driver/` file. (With `--no-tree`, checkpatch cannot read the kernel's binding
+  documentation, so the undocumented-compatible check does not run.)
+- Reason: nothing to allow; the script still supports the list if a future change needs it.
+- Alternatives considered: none.
+- Consequences: if the compatible-string check is ever run with a full tree, `hvac,hvac-temp` would be
+  reported (D-015) and would be added here with that reason.
+
+## D-020: Mutation testing details
+- Date / phase: 2026-11-15, Phase 4
+- Context: the plan defines three mutants and asks why a "remove the mutex" mutant is not included.
+- Decision: (1) the three patches exactly as planned; (2) a mutant that fails to compile is reported as
+  `build-error`, not as killed (a compiler error proves nothing about the tests); (3) the script backs up
+  `driver/` and restores it in a `trap`, then rebuilds the original image.
+- Reason for no mutex mutant: removing the lock creates a race, and a race shows up only when two threads
+  hit the same few instructions at the same moment. On `i2c-stub` each transfer is a quick memory access,
+  so a test could pass thousands of times with the bug present. A mutant that is not reliably killed
+  would make the score depend on luck. Lock correctness is instead checked by lockdep (`PROVE_LOCKING`)
+  and by code review.
+- Alternatives considered: adding delays inside the driver to widen the race (changes the code under test).
+- Consequences: mutation score target 3/3.
+

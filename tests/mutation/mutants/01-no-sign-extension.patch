@@ -1,0 +1,11 @@
+--- a/driver/hvac_temp_conv.h	2026-11-15 19:32:28.482195642 +0000
++++ b/driver/hvac_temp_conv.h	2026-11-15 19:32:28.486195641 +0000
+@@ -17,7 +17,7 @@
+ /* 16-bit chip register -> signed raw steps (-2048..2047). */
+ static inline int hvac_temp_reg_to_raw(u16 reg)
+ {
+-	return sign_extend32(reg >> 4, 11);
++	return reg >> 4;
+ }
+ 
+ /* Signed raw steps -> 16-bit chip register (bits 3..0 zero). */

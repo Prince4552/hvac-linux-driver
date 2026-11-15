@@ -1,15 +1,50 @@
 {
  "schema": 1,
  "metrics": {
+  "concurrent_read_errors": {
+   "value": 0,
+   "unit": "count",
+   "meaning": "Wrong or failed readings with 8 threads reading at once (8 x 1000 reads)"
+  },
+  "driver_load_unload_cycles": {
+   "value": 500,
+   "unit": "count",
+   "meaning": "Times the driver was loaded, used and removed without a problem"
+  },
+  "driver_read_latency_median_us": {
+   "value": 1134,
+   "unit": "us",
+   "meaning": "Time for one temperature read on the emulated board, including Python overhead (median); relative numbers only"
+  },
+  "driver_read_latency_p99_us": {
+   "value": 4406,
+   "unit": "us",
+   "meaning": "Time for one temperature read on the emulated board, including Python overhead (99th percentile); relative numbers only"
+  },
   "guest_boot_to_tests_s": {
-   "value": 9.0,
+   "value": 8.9,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
+  },
+  "kasan_reports": {
+   "value": 0,
+   "unit": "count",
+   "meaning": "Invalid memory accesses (use-after-free, out of bounds) in the whole run"
+  },
+  "kmemleak_reports": {
+   "value": 0,
+   "unit": "count",
+   "meaning": "Memory blocks our driver allocated and never freed (after 200 cycles)"
   },
   "kunit_cases_passed": {
    "value": 5,
    "unit": "count",
    "meaning": "Kernel-level checks of the conversion math (KUnit cases passed)"
+  },
+  "lockdep_reports": {
+   "value": 0,
+   "unit": "count",
+   "meaning": "Locking mistakes that could deadlock, in the whole run"
   }
  }
 }

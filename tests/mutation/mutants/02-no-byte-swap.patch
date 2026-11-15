@@ -1,0 +1,31 @@
+--- a/driver/hvac_temp_main.c	2026-11-15 19:32:28.490195641 +0000
++++ b/driver/hvac_temp_main.c	2026-11-15 19:32:28.490195641 +0000
+@@ -33,7 +33,7 @@
+ 	int ret;
+ 
+ 	mutex_lock(&data->lock);
+-	ret = i2c_smbus_read_word_swapped(data->client, HVAC_TEMP_REG_TEMP);
++	ret = i2c_smbus_read_word_data(data->client, HVAC_TEMP_REG_TEMP);
+ 	mutex_unlock(&data->lock);
+ 	if (ret < 0)
+ 		return ret;
+--- a/driver/hvac_temp_alarm.c	2026-11-15 19:32:28.490195641 +0000
++++ b/driver/hvac_temp_alarm.c	2026-11-15 19:32:28.494195640 +0000
+@@ -29,7 +29,7 @@
+ 	int ret;
+ 
+ 	mutex_lock(&data->lock);
+-	ret = i2c_smbus_read_word_swapped(data->client, hvac_temp_attr_reg(attr));
++	ret = i2c_smbus_read_word_data(data->client, hvac_temp_attr_reg(attr));
+ 	mutex_unlock(&data->lock);
+ 	if (ret < 0)
+ 		return ret;
+@@ -53,7 +53,7 @@
+ 
+ 	reg_val = hvac_temp_raw_to_reg(hvac_temp_mc_to_raw(mc));
+ 	mutex_lock(&data->lock);
+-	ret = i2c_smbus_write_word_swapped(data->client, hvac_temp_attr_reg(attr), reg_val);
++	ret = i2c_smbus_write_word_data(data->client, hvac_temp_attr_reg(attr), reg_val);
+ 	mutex_unlock(&data->lock);
+ 	if (ret < 0)
+ 		return ret;

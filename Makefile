@@ -17,7 +17,7 @@ help:
 	@echo "make test-qemu  - boot QEMU in autotest mode and run all in-guest tests"
 	@echo "make test-all   - test-host then test-qemu (the phase gate)"
 	@echo "make metrics    - regenerate results/metrics.json and results/METRICS.md"
-	@echo "make mutation   - mutation testing of the driver (slow)"
+	@echo "make mutation   - mutation testing of the driver (slow, about 15 min)"
 
 check-env:
 	./scripts/check_env.sh
@@ -39,6 +39,7 @@ test-host:
 
 test-qemu:
 	./scripts/build.sh
+	./scripts/static_analysis.sh
 	./scripts/test_qemu.sh
 
 # The phase gate: host tests first (fast), then the full guest run.
@@ -51,5 +52,6 @@ test-all:
 metrics:
 	@echo "make $@: added in Phase 7"; exit 1
 
+# Slow (three full rebuild + guest runs); part of the Phase 4 and Phase 7 gates, not of CI.
 mutation:
-	@echo "make $@: added in Phase 4"; exit 1
+	./scripts/run_mutation.sh
