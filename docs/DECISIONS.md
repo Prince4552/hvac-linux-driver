@@ -161,3 +161,12 @@ Format (newest at the bottom):
   `kmemleak: N new suspected memory leaks` and would still fail the check.
 - Alternatives considered: weakening the pattern to `kmemleak: .*leak` everywhere (would be broader).
 - Consequences: none.
+
+## D-015: Fictional device-tree vendor prefix `hvac`
+- Date / phase: 2026-11-15, Phase 2
+- Context: the plan fixes the compatible string `"hvac,hvac-temp"` and asks for it to be recorded.
+- Decision: use it as given. `hvac` is not a registered vendor prefix in the kernel's
+  `Documentation/devicetree/bindings/vendor-prefixes.yaml`; this is an out-of-tree learning driver.
+- Reason: a real product would use its manufacturer's registered prefix (for example `ti,tmp102`).
+- Alternatives considered: `ti,tmp102` (would collide with the real in-kernel tmp102 driver).
+- Consequences: `checkpatch.pl` warns about the undocumented compatible (allowed in Phase 4, with reason).

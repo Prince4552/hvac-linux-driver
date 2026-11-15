@@ -2,7 +2,7 @@
  "schema": 1,
  "metrics": {
   "guest_boot_to_tests_s": {
-   "value": 9.5,
+   "value": 8.7,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
   }

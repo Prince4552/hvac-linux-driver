@@ -1,0 +1,9 @@
+config BR2_PACKAGE_HVAC_TEMP
+	bool "hvac-temp"
+	depends on BR2_LINUX_KERNEL
+	help
+	  hvac_temp: Linux IIO driver for a TMP102-compatible I2C
+	  temperature sensor (this project's driver/ folder).
+
+comment "hvac-temp needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL

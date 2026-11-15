@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Kernel build rule: build hello.c as a loadable module, hello.ko.
+obj-m := hello.o

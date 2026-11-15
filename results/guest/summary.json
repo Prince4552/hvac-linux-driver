@@ -1,21 +1,51 @@
 {
  "schema": 1,
  "kernel": "6.18.7",
- "passed": 34,
+ "passed": 40,
  "failed": 0,
  "errors": 0,
  "skipped": 0,
- "duration_s": 6.2,
+ "duration_s": 21.7,
  "tests": [
+  {
+   "name": "test_driver_probe::test_hello_module_logs_load_and_unload",
+   "outcome": "passed",
+   "duration_s": 0.397
+  },
+  {
+   "name": "test_driver_probe::test_driver_module_loads_and_is_listed",
+   "outcome": "passed",
+   "duration_s": 0.27
+  },
+  {
+   "name": "test_driver_probe::test_probe_succeeds_when_chip_answers",
+   "outcome": "passed",
+   "duration_s": 0.618
+  },
+  {
+   "name": "test_driver_probe::test_probe_fails_cleanly_when_no_chip",
+   "outcome": "passed",
+   "duration_s": 0.543
+  },
+  {
+   "name": "test_driver_probe::test_delete_device_unbinds_cleanly",
+   "outcome": "passed",
+   "duration_s": 0.54
+  },
+  {
+   "name": "test_driver_probe::test_repeated_load_bind_unbind_unload_cycles_are_clean",
+   "outcome": "passed",
+   "duration_s": 13.234
+  },
   {
    "name": "test_smoke::test_machine_is_aarch64",
    "outcome": "passed",
-   "duration_s": 0.053
+   "duration_s": 0.046
   },
   {
    "name": "test_smoke::test_kernel_version_matches_versions_md",
    "outcome": "passed",
-   "duration_s": 0.046
+   "duration_s": 0.049
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_MODULES=y]",
@@ -25,7 +55,7 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_MODULE_UNLOAD=y]",
    "outcome": "passed",
-   "duration_s": 0.05
+   "duration_s": 0.058
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C=y]",
@@ -35,22 +65,22 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C_CHARDEV=y]",
    "outcome": "passed",
-   "duration_s": 0.051
+   "duration_s": 0.055
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C_STUB=m]",
    "outcome": "passed",
-   "duration_s": 0.053
+   "duration_s": 0.051
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IIO=y]",
    "outcome": "passed",
-   "duration_s": 0.057
+   "duration_s": 0.055
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_SENSORS_TMP102 is not set]",
    "outcome": "passed",
-   "duration_s": 0.054
+   "duration_s": 0.057
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_FS=y]",
@@ -60,52 +90,52 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_KERNEL=y]",
    "outcome": "passed",
-   "duration_s": 0.056
+   "duration_s": 0.057
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IKCONFIG=y]",
    "outcome": "passed",
-   "duration_s": 0.045
+   "duration_s": 0.053
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IKCONFIG_PROC=y]",
    "outcome": "passed",
-   "duration_s": 0.046
+   "duration_s": 0.054
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KUNIT=y]",
    "outcome": "passed",
-   "duration_s": 0.057
+   "duration_s": 0.062
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KUNIT_DEBUGFS=y]",
    "outcome": "passed",
-   "duration_s": 0.056
+   "duration_s": 0.063
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KASAN=y]",
    "outcome": "passed",
-   "duration_s": 0.056
+   "duration_s": 0.063
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KASAN_GENERIC=y]",
    "outcome": "passed",
-   "duration_s": 0.056
+   "duration_s": 0.057
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_KMEMLEAK=y]",
    "outcome": "passed",
-   "duration_s": 0.058
+   "duration_s": 0.057
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_DEBUG_KMEMLEAK_AUTO_SCAN is not set]",
    "outcome": "passed",
-   "duration_s": 0.063
+   "duration_s": 0.06
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_PROVE_LOCKING=y]",
    "outcome": "passed",
-   "duration_s": 0.058
+   "duration_s": 0.078
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_ATOMIC_SLEEP=y]",
@@ -115,67 +145,67 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_WATCHDOG=y]",
    "outcome": "passed",
-   "duration_s": 0.052
+   "duration_s": 0.059
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_SOFT_WATCHDOG=m]",
    "outcome": "passed",
-   "duration_s": 0.054
+   "duration_s": 0.055
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_WATCHDOG_NOWAYOUT is not set]",
    "outcome": "passed",
-   "duration_s": 0.059
+   "duration_s": 0.057
   },
   {
    "name": "test_smoke::test_debugfs_is_mounted",
    "outcome": "passed",
-   "duration_s": 0.042
+   "duration_s": 0.048
   },
   {
    "name": "test_smoke::test_debugfs_entry_exists[/sys/kernel/debug/kmemleak]",
    "outcome": "passed",
-   "duration_s": 0.044
+   "duration_s": 0.052
   },
   {
    "name": "test_smoke::test_debugfs_entry_exists[/sys/kernel/debug/kunit]",
    "outcome": "passed",
-   "duration_s": 0.043
+   "duration_s": 0.045
   },
   {
    "name": "test_smoke::test_i2c_stub_round_trip_and_clean_unload",
    "outcome": "passed",
-   "duration_s": 0.438
+   "duration_s": 0.334
   },
   {
    "name": "test_smoke::test_tool_is_present[python3]",
    "outcome": "passed",
-   "duration_s": 0.044
+   "duration_s": 0.047
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cset]",
    "outcome": "passed",
-   "duration_s": 0.044
+   "duration_s": 0.046
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cget]",
    "outcome": "passed",
-   "duration_s": 0.043
+   "duration_s": 0.044
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cdetect]",
    "outcome": "passed",
-   "duration_s": 0.045
+   "duration_s": 0.05
   },
   {
    "name": "test_smoke::test_pytest_is_present",
    "outcome": "passed",
-   "duration_s": 3.326
+   "duration_s": 2.959
   },
   {
    "name": "test_smoke::test_boot_log_is_clean",
    "outcome": "passed",
-   "duration_s": 0.079
+   "duration_s": 0.085
   }
  ]
 }

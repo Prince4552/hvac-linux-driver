@@ -1,0 +1,9 @@
+config BR2_PACKAGE_HVAC_HELLO
+	bool "hvac-hello"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Minimal "hello" kernel module used to learn how modules
+	  load and unload (examples/hello_module/).
+
+comment "hvac-hello needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL

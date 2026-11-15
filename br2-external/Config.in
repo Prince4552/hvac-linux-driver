@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: MIT
-# Menu entries for the local packages in this external tree (added from Phase 2).
+# Menu entries for the local packages in this external tree.
 menu "HVAC project packages"
+	source "$BR2_EXTERNAL_HVAC_PATH/package/hvac-temp/Config.in"
+	source "$BR2_EXTERNAL_HVAC_PATH/package/hvac-hello/Config.in"
 endmenu

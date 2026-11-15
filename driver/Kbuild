@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Kernel build rules for the hvac_temp driver (out-of-tree module).
+obj-m := hvac_temp.o
+hvac_temp-y := hvac_temp_main.o

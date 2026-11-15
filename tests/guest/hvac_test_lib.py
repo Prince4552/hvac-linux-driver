@@ -134,6 +134,12 @@ def client_dir(addr: int = CHIP_ADDR) -> str:
     return f"/sys/bus/i2c/devices/{_require_bus()}-{addr:04x}"
 
 
+def bound_driver(addr: int = CHIP_ADDR) -> Optional[str]:
+    """Name of the driver bound to the I2C client at addr, or None if unbound or absent."""
+    link = os.path.join(client_dir(addr), "driver")
+    return os.path.basename(os.readlink(link)) if os.path.islink(link) else None
+
+
 def iio_dir(name: str = DRIVER_NAME) -> Optional[str]:
     """Finds /sys/bus/iio/devices/iio:deviceN whose 'name' file matches; None if absent."""
     if not os.path.isdir(IIO_DEVICES):
