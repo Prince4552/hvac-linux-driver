@@ -1,0 +1,18 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Mounts debugfs at /sys/kernel/debug (needed by kmemleak and KUnit results) if not mounted yet.
+set -eu
+
+case "${1:-start}" in
+start)
+	if ! grep -q " /sys/kernel/debug debugfs " /proc/mounts; then
+		echo "S05debugfs: mounting debugfs"
+		mount -t debugfs none /sys/kernel/debug
+	fi
+	;;
+stop | restart | reload) ;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+	;;
+esac

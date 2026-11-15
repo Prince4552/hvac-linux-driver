@@ -1,0 +1,2 @@
+name: HVAC
+desc: HVAC temperature-sensor driver, tests and thermostat daemon (QEMU ARM64)

@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MIT
+"""pytest fixtures shared by all guest tests (PROJECT_PLAN.md section 6.2).
+
+- check_kernel_log (autouse): after every test, the kernel log written during the test must be
+  free of BUG/WARNING/Oops/KASAN/... lines. Runs as teardown, so it also runs when a test fails.
+- stub: the simulated chip (i2c-stub at 0x48) is loaded for the test and unloaded afterwards.
+"""
+from typing import Iterator
+
+import pytest
+
+import hvac_test_lib as h
+
+
+@pytest.fixture(autouse=True)
+def check_kernel_log() -> Iterator[None]:
+    marker = h.kernel_log_marker()
+    yield
+    h.assert_kernel_log_clean(h.kernel_log_since(marker))
+
+
+@pytest.fixture
+def stub() -> Iterator[int]:
+    """Yields the bus number of a freshly loaded i2c-stub; always unloads it afterwards."""
+    h.unload_stub()  # start from a known state even if an earlier test failed badly
+    bus = h.load_stub()
+    try:
+        yield bus
+    finally:
+        h.unload_stub()

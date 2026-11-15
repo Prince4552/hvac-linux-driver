@@ -1,0 +1,44 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Demo mode (normal boot, not autotest): loads the simulated chip (i2c-stub at 0x48) and sets it to
+# 25 degrees C. Later phases add the hvac_temp driver and the hvacd daemon here.
+# Does nothing when the kernel command line contains hvac_autotest=1.
+set -eu
+
+CHIP_ADDR=0x48
+TEMP_25C_SWAPPED=0x0019 # chip register 0x1900 = 25 C, byte-swapped for i2c-stub (PROJECT_PLAN 4.1)
+
+is_autotest() {
+	grep -qw "hvac_autotest=1" /proc/cmdline
+}
+
+stub_bus() {
+	for d in /sys/bus/i2c/devices/i2c-*; do
+		if [ "$(cat "$d/name")" = "SMBus stub driver" ]; then
+			basename "$d" | sed 's/i2c-//'
+			return 0
+		fi
+	done
+	return 1
+}
+
+start() {
+	if is_autotest; then
+		echo "S90hvac-demo: autotest mode, demo not started"
+		return 0
+	fi
+	echo "S90hvac-demo: loading i2c-stub at ${CHIP_ADDR}"
+	modprobe i2c-stub chip_addr="${CHIP_ADDR}"
+	bus="$(stub_bus)"
+	i2cset -y "${bus}" "${CHIP_ADDR}" 0x00 "${TEMP_25C_SWAPPED}" w
+	echo "S90hvac-demo: simulated chip on bus ${bus} reads 25 C"
+}
+
+case "${1:-start}" in
+start) start ;;
+stop | restart | reload) ;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+	;;
+esac

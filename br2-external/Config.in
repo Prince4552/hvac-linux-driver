@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT
+# Menu entries for the local packages in this external tree (added from Phase 2).
+menu "HVAC project packages"
+endmenu

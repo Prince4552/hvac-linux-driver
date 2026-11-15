@@ -28,9 +28,25 @@ venv:
 lint: venv
 	./scripts/lint.sh
 
+build:
+	./scripts/build.sh
+
+run:
+	./scripts/run_qemu.sh
+
+test-host:
+	./scripts/test_host.sh
+
+test-qemu:
+	./scripts/build.sh
+	./scripts/test_qemu.sh
+
+# The phase gate: host tests first (fast), then the full guest run.
+test-all:
+	$(MAKE) test-host
+	$(MAKE) test-qemu
+
 # Placeholders: they fail on purpose so nobody mistakes them for a passing step.
-build run test-host test-qemu test-all:
-	@echo "make $@: added in Phase 1"; exit 1
 
 metrics:
 	@echo "make $@: added in Phase 7"; exit 1

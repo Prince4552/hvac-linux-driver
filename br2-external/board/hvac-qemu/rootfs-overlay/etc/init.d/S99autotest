@@ -1,0 +1,23 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Autotest mode: when the kernel command line contains hvac_autotest=1, runs the guest test runner,
+# which prints the results between markers on the console and then powers the board off.
+set -eu
+
+RUNNER=/opt/hvac-tests/run_guest_tests.sh
+
+case "${1:-start}" in
+start)
+	if grep -qw "hvac_autotest=1" /proc/cmdline; then
+		echo "S99autotest: starting ${RUNNER}"
+		# The runner always powers off; run it in the foreground so nothing else starts.
+		"${RUNNER}" || true
+		poweroff -f
+	fi
+	;;
+stop | restart | reload) ;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+	;;
+esac
