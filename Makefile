@@ -47,10 +47,9 @@ test-all:
 	$(MAKE) test-host
 	$(MAKE) test-qemu
 
-# Placeholders: they fail on purpose so nobody mistakes them for a passing step.
-
 metrics:
-	@echo "make $@: added in Phase 7"; exit 1
+	./scripts/setup_host_venv.sh
+	.venv/bin/python3 scripts/collect_metrics.py results
 
 # Slow (three full rebuild + guest runs); part of the Phase 4 and Phase 7 gates, not of CI.
 mutation:

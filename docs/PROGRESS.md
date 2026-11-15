@@ -17,7 +17,7 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 4 | Driver hardening (robustness, memory, static analysis, mutation) | done | `make test-all && make mutation`: lint + static clean, guest 90/90, 0 skipped, mutation 3/3 | `phase 4: Driver hardening` / `phase-4` |
 | 5 | Thermostat control core and simulation | done | `make test-all`: host 52 unit tests x3 (normal/ASan+UBSan/Valgrind) + SIL checks, guest 90/90, 0 skipped | `phase 5: Thermostat control core and simulation` / `phase-5` |
 | 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | done | `make test-all`: host 76/76 (67 unit x3 + 9 integration), guest 98/98, 0 skipped | `phase 6: Thermostat daemon on the board` / `phase-6` |
-| 7 | CI, metrics, documentation, publishing (v1.0.0) | in progress | | |
+| 7 | CI, metrics, documentation, publishing (v1.0.0) | in progress | `make test-all && make mutation && make metrics`: host 76/76, guest 98/98, 0 skipped, mutation 3/3, 41/41 metrics on target; CI: pending | `phase 7: CI, metrics, documentation, publishing` / `phase-7` |
 | Ext 1 | Watchdog supervision | not started | | |
 | Ext 2 | Fault detection and diagnostics | not started | | |
 | Ext 3 | MQTT telemetry | not started | | |
@@ -27,17 +27,17 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 7 (CI, metrics, documentation, publishing)
+Phase: 7 (CI, metrics, documentation, publishing): committed locally; next: publish and verify
 
-Phase 6 task checklist (done):
+Phase 7 task checklist:
 
-- [x] `log.c`, `sensor_iio.c`, `modbus_regs.c` (D-024), `modbus_server.c`, `main.c`
-- [x] `test_sensor_iio.c` (9), `test_modbus_regs.c` (6)
-- [x] Buildroot package `hvacd`, `/etc/hvacd.conf` (from `thermostat/config/`), demo `S90hvac-demo`
-- [x] `tests/common/modbus_client.py` (+ CLI), `tests/common/hvacd_runner.py`
-- [x] `tests/host/test_daemon_host.py` (9, incl. Valgrind)
-- [x] `tests/guest/test_daemon_e2e.py` (8) + metrics; weak read-back test fixed (D-025)
-- [x] Gate; learning note `docs/phases/phase-06-daemon.md`
+- [x] `.github/workflows/ci.yml` (jobs `host`, `qemu`; cache; artifacts; free disk)
+- [x] `scripts/collect_metrics.py` + `make metrics` (41 metrics); D-026
+- [x] `README.md`, `docs/TECHNICAL_REPORT.md` (3,700 words), `THIRD_PARTY.md`, `VERSIONS.md`
+- [x] Full gate incl. mutation from a clean build; metrics all on target
+- [x] Commit `phase 7: ...`, tag `phase-7`
+- [ ] Publish (`gh repo create`), push, `scripts/verify_push.sh`, wait for CI
+- [ ] Release `v1.0.0`
 
 ## Blockers
 
@@ -62,6 +62,7 @@ log file path, what you need from the user.)
   592.2, 0 short cycles, comfort 100 % in all scenarios.
 - Phase 6: host 76 (67 unit + 9 integration), guest 98; fault detection 0.07 s; Modbus round trip 2.15 ms;
   hvacd RSS 1412 kB, binary 26480 bytes; Valgrind 0 errors.
+- Phase 7: clean full build 5.9 min (warm caches); 41/41 metrics on target; mutation 3/3 (11/29/4).
 
 ## Publishing
 

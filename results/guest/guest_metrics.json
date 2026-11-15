@@ -12,22 +12,22 @@
    "meaning": "Times the driver was loaded, used and removed without a problem"
   },
   "driver_read_latency_median_us": {
-   "value": 1120,
+   "value": 1221,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (median); relative numbers only"
   },
   "driver_read_latency_p99_us": {
-   "value": 3987,
+   "value": 4921,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (99th percentile); relative numbers only"
   },
   "fault_detection_latency_s": {
-   "value": 0.07,
+   "value": 0.12,
    "unit": "s",
    "meaning": "Time from sensor loss (device deleted) to the alarm being visible over Modbus"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.6,
+   "value": 8.7,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
   },
@@ -37,7 +37,7 @@
    "meaning": "Size of the stripped hvacd program on the board"
   },
   "hvacd_rss_kb": {
-   "value": 1412,
+   "value": 1396,
    "unit": "kB",
    "meaning": "Daemon memory in use (resident) after 30 s"
   },
@@ -62,7 +62,7 @@
    "meaning": "Locking mistakes that could deadlock, in the whole run"
   },
   "modbus_roundtrip_median_ms": {
-   "value": 2.15,
+   "value": 2.09,
    "unit": "ms",
    "meaning": "Time for a Modbus request and reply on the emulated board (relative only)"
   }

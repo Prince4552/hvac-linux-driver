@@ -13,7 +13,12 @@ BUILD_LOG="${LOG_DIR}/build.log"
 exec > >(tee "${BUILD_LOG}") 2>&1
 
 start_s="$(date +%s)"
-echo "[build] $(date -u +%FT%TZ) starting"
+INFO_JSON="${ROOT}/results/host/build_info.json"
+# A "full" build starts from an empty output folder (downloads and ccache may already be cached).
+full_build=false
+[[ -f "${BR_OUT}/.config" ]] || full_build=true
+previous_full="$(sed -n 's/.*"full_build_duration_min": \([0-9.]*\).*/\1/p' "${INFO_JSON}" 2> /dev/null || true)"
+echo "[build] $(date -u +%FT%TZ) starting (full build: ${full_build})"
 
 "${ROOT}/scripts/fetch_buildroot.sh"
 
@@ -46,6 +51,8 @@ echo "${want}" > "${STAMP}"
 
 end_s="$(date +%s)"
 duration_min="$(awk -v s="$((end_s - start_s))" 'BEGIN { printf "%.1f", s / 60 }')"
+full_min="${previous_full:-null}"
+[[ "${full_build}" == true ]] && full_min="${duration_min}"
 kernel_version="$(sed -n 's/^BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="\(.*\)"/\1/p' "${BR_OUT}/.config")"
 toolchain="$(grep -A1 '^config BR2_TOOLCHAIN_EXTERNAL_BOOTLIN_AARCH64_GLIBC_STABLE$' \
 	"${BR_DIR}/toolchain/toolchain-external/toolchain-external-bootlin/Config.in.options" |
@@ -55,10 +62,11 @@ image_bytes="$(stat -c %s "${IMAGES_DIR}/Image")"
 # The ext4 image file is sparse: report the space it really uses, not its 768 MB nominal size.
 rootfs_used_mb="$(du -m -L "${IMAGES_DIR}/rootfs.ext4" | cut -f1)"
 
-cat > "${ROOT}/results/host/build_info.json" << EOF
+cat > "${INFO_JSON}" << EOF
 {"schema": 1, "buildroot_version": "${BR_VERSION}", "kernel_version": "${kernel_version}",
  "toolchain": "${toolchain}", "gcc_version": "${gcc_version}",
- "build_duration_min": ${duration_min}, "kernel_image_bytes": ${image_bytes},
+ "build_duration_min": ${duration_min}, "full_build_duration_min": ${full_min},
+ "kernel_image_bytes": ${image_bytes},
  "rootfs_size_mb": ${rootfs_used_mb}}
 EOF
 echo "[build] done in ${duration_min} min; image ${image_bytes} bytes, rootfs ${rootfs_used_mb} MB used"

@@ -1,0 +1,47 @@
+# Metrics
+
+Generated 2026-11-15T20:47:48Z from commit `8a4aa34` by `make metrics`. Timing numbers come from an emulated ARM64 board (QEMU without hardware acceleration) and are only meaningful relative to each other.
+
+| Metric | Value | Target | Pass | What it means |
+| --- | --- | --- | --- | --- |
+| `guest_tests_passed` | 98 count | report | yes | In-guest tests that passed on the emulated board |
+| `guest_tests_failed` | 0 count | == 0 | yes | In-guest tests that failed, errored or were skipped |
+| `host_tests_passed` | 76 count | report | yes | Unit, integration and simulation checks on the host |
+| `host_tests_failed` | 0 count | == 0 | yes | Host checks that failed |
+| `kunit_cases_passed` | 5 count | == 5 | yes | Kernel-level checks of the conversion math (all KUnit cases) |
+| `driver_load_unload_cycles` | 500 count | >= 500 | yes | Times the driver was loaded and removed without a problem |
+| `kmemleak_reports` | 0 count | == 0 | yes | Memory blocks our driver allocated and never freed |
+| `kasan_reports` | 0 count | == 0 | yes | Invalid memory accesses (use-after-free, out of bounds) |
+| `lockdep_reports` | 0 count | == 0 | yes | Locking mistakes that could deadlock |
+| `concurrent_read_errors` | 0 count | == 0 | yes | Wrong or failed readings with 8 threads reading at once |
+| `driver_read_latency_median_us` | 1221 us | report | yes | Time for one temperature read on the emulated board (median; relative only) |
+| `driver_read_latency_p99_us` | 4921 us | report | yes | Time for one temperature read on the emulated board (p99; relative only) |
+| `checkpatch_errors` | 0 count | == 0 | yes | Kernel coding-style errors |
+| `checkpatch_warnings` | 0 count | == 0 | yes | Kernel coding-style warnings (allowed types excluded) |
+| `sparse_warnings` | 0 count | == 0 | yes | Kernel type-checking problems |
+| `mutation_score` | 3/3 killed/total | == 3/3 | yes | Deliberately inserted bugs that the tests caught |
+| `cppcheck_findings` | 0 count | == 0 | yes | Likely bugs in user-space C found without running it |
+| `core_line_coverage_pct` | 100.0 % | >= 95 | yes | Share of control-core lines exercised by unit tests |
+| `core_branch_coverage_pct` | 98.9 % | >= 90 | yes | Share of control-core branches exercised by unit tests |
+| `sanitizer_errors` | 0 count | == 0 | yes | Memory and undefined-behavior errors found by ASan/UBSan |
+| `valgrind_errors` | 0 count | == 0 | yes | Memory errors found by Valgrind |
+| `valgrind_leaked_bytes` | 0 bytes | == 0 | yes | Memory leaked (definitely or indirectly lost) in user-space code |
+| `sil_comfort_pct_hot_day` | 100.0 % | >= 98 | yes | Share of time the simulated room stayed within 18.5..27.5 C |
+| `sil_starts_per_hour_hot_day_product` | 2.83 per hour | < 592.2 | yes | How often the compressor starts (fewer is gentler) |
+| `sil_starts_per_hour_hot_day_baseline` | 592.2 per hour | report | yes | Compressor starts per hour of the naive baseline controller |
+| `sil_short_cycle_violations_hot_day` | 0 count | == 0 | yes | Compressor restarts that came too soon |
+| `sil_comfort_pct_cold_day` | 100.0 % | >= 98 | yes | Share of time the simulated room stayed within 18.5..27.5 C |
+| `sil_starts_per_hour_cold_day_product` | 0.0 per hour | == 0 | yes | How often the compressor starts (fewer is gentler) |
+| `sil_starts_per_hour_cold_day_baseline` | 0.0 per hour | report | yes | Compressor starts per hour of the naive baseline controller |
+| `sil_short_cycle_violations_cold_day` | 0 count | == 0 | yes | Compressor restarts that came too soon |
+| `sil_comfort_pct_mild_day` | 100.0 % | >= 98 | yes | Share of time the simulated room stayed within 18.5..27.5 C |
+| `sil_starts_per_hour_mild_day_product` | 0.5 per hour | < 113.5 | yes | How often the compressor starts (fewer is gentler) |
+| `sil_starts_per_hour_mild_day_baseline` | 113.5 per hour | report | yes | Compressor starts per hour of the naive baseline controller |
+| `sil_short_cycle_violations_mild_day` | 0 count | == 0 | yes | Compressor restarts that came too soon |
+| `modbus_roundtrip_median_ms` | 2.09 ms | report | yes | Time for a Modbus request and reply on the emulated board |
+| `fault_detection_latency_s` | 0.12 s | <= 1.6 | yes | Time from sensor loss to alarm visible over Modbus (target 3 x 0.2 s + 1 s) |
+| `hvacd_rss_kb` | 1396 kB | report | yes | Daemon memory use after 30 s |
+| `hvacd_binary_bytes` | 26480 bytes | report | yes | Daemon program size (stripped) |
+| `guest_boot_to_tests_s` | 8.7 s | report | yes | Seconds from kernel start to the start of the guest tests |
+| `build_duration_min` | 5.9 min | report | yes | Duration of the last full (from empty output folder) image build |
+| `rootfs_size_mb` | 55 MB | report | yes | Space used by the root filesystem image |

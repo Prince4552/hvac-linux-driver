@@ -5,202 +5,202 @@
  "failed": 0,
  "errors": 0,
  "skipped": 0,
- "duration_s": 296.6,
+ "duration_s": 295.7,
  "tests": [
   {
    "name": "test_daemon_e2e::test_temperature_register_matches_chip",
    "outcome": "passed",
-   "duration_s": 0.96
+   "duration_s": 1.052
   },
   {
    "name": "test_daemon_e2e::test_state_follows_chip_temperature",
    "outcome": "passed",
-   "duration_s": 3.095
+   "duration_s": 2.87
   },
   {
    "name": "test_daemon_e2e::test_setpoint_writes_are_validated",
    "outcome": "passed",
-   "duration_s": 1.075
+   "duration_s": 1.088
   },
   {
    "name": "test_daemon_e2e::test_device_removal_gives_fault_and_recreation_recovers",
    "outcome": "passed",
-   "duration_s": 1.536
+   "duration_s": 1.428
   },
   {
    "name": "test_daemon_e2e::test_modbus_round_trip_and_memory_metrics",
    "outcome": "passed",
-   "duration_s": 31.014
+   "duration_s": 31.1
   },
   {
    "name": "test_daemon_e2e::test_sigterm_exits_zero",
    "outcome": "passed",
-   "duration_s": 0.766
+   "duration_s": 0.834
   },
   {
    "name": "test_daemon_e2e::test_bad_config_exits_one_with_clear_message",
    "outcome": "passed",
-   "duration_s": 0.091
+   "duration_s": 0.1
   },
   {
    "name": "test_daemon_e2e::test_version_flag",
    "outcome": "passed",
-   "duration_s": 0.077
+   "duration_s": 0.083
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[25000-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.585
+   "duration_s": 0.67
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[25000-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.647
+   "duration_s": 0.634
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[-10000-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.636
+   "duration_s": 0.639
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[-10000-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.613
+   "duration_s": 0.645
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[0-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.587
+   "duration_s": 0.69
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[0-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.569
+   "duration_s": 0.711
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[125000-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.608
+   "duration_s": 0.66
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[125000-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.62
+   "duration_s": 0.667
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[-40000-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.607
+   "duration_s": 0.75
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[-40000-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.629
+   "duration_s": 0.665
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[62-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.631
+   "duration_s": 0.664
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[62-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.636
+   "duration_s": 0.647
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[31-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.605
+   "duration_s": 0.618
   },
   {
    "name": "test_driver_alarms::test_alarm_write_stores_rounded_register_and_reads_back[31-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.603
+   "duration_s": 0.639
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[abc-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.607
+   "duration_s": 0.643
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[abc-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.622
+   "duration_s": 0.687
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[empty-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.604
+   "duration_s": 0.661
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[empty-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.635
+   "duration_s": 0.738
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[125001-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.634
+   "duration_s": 0.64
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[125001-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.599
+   "duration_s": 0.662
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[-40001-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.611
+   "duration_s": 0.688
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[-40001-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.614
+   "duration_s": 0.643
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[huge-alarm_high_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.645
+   "duration_s": 0.591
   },
   {
    "name": "test_driver_alarms::test_invalid_alarm_write_is_rejected_and_register_unchanged[huge-alarm_low_millicelsius]",
    "outcome": "passed",
-   "duration_s": 0.604
+   "duration_s": 0.651
   },
   {
    "name": "test_driver_alarms::test_low_above_high_is_allowed",
    "outcome": "passed",
-   "duration_s": 0.584
+   "duration_s": 0.581
   },
   {
    "name": "test_driver_attributes::test_iio_device_name_is_hvac_temp",
    "outcome": "passed",
-   "duration_s": 0.563
+   "duration_s": 0.568
   },
   {
    "name": "test_driver_attributes::test_scale_is_62_5_millidegrees_per_step",
    "outcome": "passed",
-   "duration_s": 0.566
+   "duration_s": 0.575
   },
   {
    "name": "test_driver_attributes::test_alarm_files_are_read_write",
    "outcome": "passed",
-   "duration_s": 0.524
+   "duration_s": 0.635
   },
   {
    "name": "test_driver_attributes::test_channel_files_are_read_only_in_behavior[in_temp_raw]",
    "outcome": "passed",
-   "duration_s": 0.565
+   "duration_s": 0.602
   },
   {
    "name": "test_driver_attributes::test_channel_files_are_read_only_in_behavior[in_temp_scale]",
    "outcome": "passed",
-   "duration_s": 0.557
+   "duration_s": 0.573
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[+125 C]",
    "outcome": "passed",
-   "duration_s": 0.613
+   "duration_s": 0.599
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[+25 C]",
@@ -210,122 +210,122 @@
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[+0.0625 C]",
    "outcome": "passed",
-   "duration_s": 0.615
+   "duration_s": 0.611
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[0 C]",
    "outcome": "passed",
-   "duration_s": 0.563
+   "duration_s": 0.66
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[-0.0625 C]",
    "outcome": "passed",
-   "duration_s": 0.598
+   "duration_s": 0.65
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[-25 C]",
    "outcome": "passed",
-   "duration_s": 0.593
+   "duration_s": 0.624
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[-40 C]",
    "outcome": "passed",
-   "duration_s": 0.614
+   "duration_s": 0.606
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[0x1230]",
    "outcome": "passed",
-   "duration_s": 0.568
+   "duration_s": 0.595
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[0x0120]",
    "outcome": "passed",
-   "duration_s": 0.615
+   "duration_s": 0.576
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[0xF350]",
    "outcome": "passed",
-   "duration_s": 0.624
+   "duration_s": 0.564
   },
   {
    "name": "test_driver_conversion::test_register_value_reads_back_as_raw_and_millidegrees[low bits ignored]",
    "outcome": "passed",
-   "duration_s": 0.614
+   "duration_s": 0.63
   },
   {
    "name": "test_driver_conversion::test_set_temp_raw_helper_matches_driver",
    "outcome": "passed",
-   "duration_s": 0.86
+   "duration_s": 0.867
   },
   {
    "name": "test_driver_probe::test_hello_module_logs_load_and_unload",
    "outcome": "passed",
-   "duration_s": 0.313
+   "duration_s": 0.341
   },
   {
    "name": "test_driver_probe::test_driver_module_loads_and_is_listed",
    "outcome": "passed",
-   "duration_s": 0.27
+   "duration_s": 0.258
   },
   {
    "name": "test_driver_probe::test_probe_succeeds_when_chip_answers",
    "outcome": "passed",
-   "duration_s": 0.594
+   "duration_s": 0.548
   },
   {
    "name": "test_driver_probe::test_probe_fails_cleanly_when_no_chip",
    "outcome": "passed",
-   "duration_s": 0.586
+   "duration_s": 0.556
   },
   {
    "name": "test_driver_probe::test_delete_device_unbinds_cleanly",
    "outcome": "passed",
-   "duration_s": 0.541
+   "duration_s": 0.574
   },
   {
    "name": "test_driver_probe::test_repeated_load_bind_unbind_unload_cycles_are_clean",
    "outcome": "passed",
-   "duration_s": 13.228
+   "duration_s": 13.222
   },
   {
    "name": "test_driver_robustness::test_concurrent_reads_return_the_set_value",
    "outcome": "passed",
-   "duration_s": 6.558
+   "duration_s": 6.6
   },
   {
    "name": "test_driver_robustness::test_concurrent_reads_and_alarm_writes",
    "outcome": "passed",
-   "duration_s": 2.13
+   "duration_s": 2.141
   },
   {
    "name": "test_driver_robustness::test_load_unload_stress",
    "outcome": "passed",
-   "duration_s": 131.958
+   "duration_s": 129.554
   },
   {
    "name": "test_driver_robustness::test_remove_while_reading_fails_cleanly",
    "outcome": "passed",
-   "duration_s": 0.743
+   "duration_s": 0.696
   },
   {
    "name": "test_kunit::test_kunit_conversion_suite_passes",
    "outcome": "passed",
-   "duration_s": 0.35
+   "duration_s": 0.341
   },
   {
    "name": "test_memory::test_no_kmemleak_reports_for_driver",
    "outcome": "passed",
-   "duration_s": 63.893
+   "duration_s": 64.148
   },
   {
    "name": "test_memory::test_kasan_and_lockdep_enabled_and_silent",
    "outcome": "passed",
-   "duration_s": 0.21
+   "duration_s": 0.221
   },
   {
    "name": "test_memory::test_read_latency",
    "outcome": "passed",
-   "duration_s": 1.994
+   "duration_s": 2.081
   },
   {
    "name": "test_smoke::test_machine_is_aarch64",
@@ -335,32 +335,32 @@
   {
    "name": "test_smoke::test_kernel_version_matches_versions_md",
    "outcome": "passed",
-   "duration_s": 0.079
+   "duration_s": 0.08
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_MODULES=y]",
    "outcome": "passed",
-   "duration_s": 0.084
+   "duration_s": 0.081
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_MODULE_UNLOAD=y]",
    "outcome": "passed",
-   "duration_s": 0.079
+   "duration_s": 0.083
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C=y]",
    "outcome": "passed",
-   "duration_s": 0.085
+   "duration_s": 0.086
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C_CHARDEV=y]",
    "outcome": "passed",
-   "duration_s": 0.086
+   "duration_s": 0.087
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_I2C_STUB=m]",
    "outcome": "passed",
-   "duration_s": 0.083
+   "duration_s": 0.088
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IIO=y]",
@@ -370,12 +370,12 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_SENSORS_TMP102 is not set]",
    "outcome": "passed",
-   "duration_s": 0.099
+   "duration_s": 0.092
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_FS=y]",
    "outcome": "passed",
-   "duration_s": 0.088
+   "duration_s": 0.092
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_KERNEL=y]",
@@ -385,27 +385,27 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IKCONFIG=y]",
    "outcome": "passed",
-   "duration_s": 0.082
+   "duration_s": 0.086
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_IKCONFIG_PROC=y]",
    "outcome": "passed",
-   "duration_s": 0.081
+   "duration_s": 0.083
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KUNIT=y]",
    "outcome": "passed",
-   "duration_s": 0.091
+   "duration_s": 0.089
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KUNIT_DEBUGFS=y]",
    "outcome": "passed",
-   "duration_s": 0.092
+   "duration_s": 0.09
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KASAN=y]",
    "outcome": "passed",
-   "duration_s": 0.091
+   "duration_s": 0.084
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_KASAN_GENERIC=y]",
@@ -415,37 +415,37 @@
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_KMEMLEAK=y]",
    "outcome": "passed",
-   "duration_s": 0.088
+   "duration_s": 0.092
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_DEBUG_KMEMLEAK_AUTO_SCAN is not set]",
    "outcome": "passed",
-   "duration_s": 0.088
+   "duration_s": 0.089
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_PROVE_LOCKING=y]",
    "outcome": "passed",
-   "duration_s": 0.086
+   "duration_s": 0.095
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_DEBUG_ATOMIC_SLEEP=y]",
    "outcome": "passed",
-   "duration_s": 0.097
+   "duration_s": 0.094
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_WATCHDOG=y]",
    "outcome": "passed",
-   "duration_s": 0.085
+   "duration_s": 0.088
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[CONFIG_SOFT_WATCHDOG=m]",
    "outcome": "passed",
-   "duration_s": 0.088
+   "duration_s": 0.083
   },
   {
    "name": "test_smoke::test_kernel_config_option_took_effect[# CONFIG_WATCHDOG_NOWAYOUT is not set]",
    "outcome": "passed",
-   "duration_s": 0.09
+   "duration_s": 0.089
   },
   {
    "name": "test_smoke::test_debugfs_is_mounted",
@@ -455,47 +455,47 @@
   {
    "name": "test_smoke::test_debugfs_entry_exists[/sys/kernel/debug/kmemleak]",
    "outcome": "passed",
-   "duration_s": 0.073
+   "duration_s": 0.078
   },
   {
    "name": "test_smoke::test_debugfs_entry_exists[/sys/kernel/debug/kunit]",
    "outcome": "passed",
-   "duration_s": 0.079
+   "duration_s": 0.08
   },
   {
    "name": "test_smoke::test_i2c_stub_round_trip_and_clean_unload",
    "outcome": "passed",
-   "duration_s": 0.402
+   "duration_s": 0.371
   },
   {
    "name": "test_smoke::test_tool_is_present[python3]",
    "outcome": "passed",
-   "duration_s": 0.081
+   "duration_s": 0.078
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cset]",
    "outcome": "passed",
-   "duration_s": 0.08
+   "duration_s": 0.078
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cget]",
    "outcome": "passed",
-   "duration_s": 0.077
+   "duration_s": 0.076
   },
   {
    "name": "test_smoke::test_tool_is_present[i2cdetect]",
    "outcome": "passed",
-   "duration_s": 0.081
+   "duration_s": 0.078
   },
   {
    "name": "test_smoke::test_pytest_is_present",
    "outcome": "passed",
-   "duration_s": 3.005
+   "duration_s": 2.654
   },
   {
    "name": "test_smoke::test_boot_log_is_clean",
    "outcome": "passed",
-   "duration_s": 0.144
+   "duration_s": 0.148
   }
  ]
 }

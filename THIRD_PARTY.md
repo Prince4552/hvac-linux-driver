@@ -13,10 +13,12 @@ into `.cache/` or installed on the host. Exact versions and checksums are in `VE
 | Buildroot | Builds the ARM64 image | 2026.02.3 | GPL-2.0-or-later | no (`.cache/`) |
 | Linux kernel | Guest kernel, `i2c-stub`, IIO, KUnit | 6.18.7 | GPL-2.0 | no (`.cache/`) |
 | Bootlin toolchain | Cross-compiler (GCC, glibc) | aarch64 glibc stable 2025.08-1 | GPL / LGPL (per component) | no (`.cache/`) |
-| BusyBox, i2c-tools, Python 3, pytest, libmodbus | Guest user space | as pinned by Buildroot 2026.02.3 | GPL-2.0 / GPL-2.0 / PSF / MIT / LGPL-2.1 | no (`.cache/`) |
+| BusyBox | Guest shell and basic tools | 1.37.0 (Buildroot 2026.02.3) | GPL-2.0 | no (`.cache/`) |
+| i2c-tools | `i2cset`, `i2cget`, `i2cdetect` in the guest | 4.4 | GPL-2.0-or-later | no (`.cache/`) |
+| Python 3 / pytest (guest) | Guest test runner | 3.14 / 9.0.2 | PSF-2.0 / MIT | no (`.cache/`) |
+| libmodbus | Modbus TCP server in `hvacd` (guest 3.1.11 via Buildroot; host package for host tests) | 3.1.11 | LGPL-2.1-or-later (dynamically linked) | no |
 | Unity | C unit-test framework | v2.7.0 | MIT | **yes**, `thermostat/third_party/unity/` (unchanged copy + license) |
 | cppcheck, Valgrind, GCC sanitizers, gcov | Host checks | host packages | GPL (tools only, nothing linked into our code) | no (host) |
-| QEMU | Emulates the ARM64 board | host package (`qemu-system-arm`) | GPL-2.0 | no (host) |
+| QEMU | Emulates the ARM64 board | host package `qemu-system-arm` (10.2.1 on the development host) | GPL-2.0 | no (host) |
 
-Rows are added as phases bring in new components (Buildroot, Linux, toolchain, Unity, libmodbus,
-mosquitto, FreeRTOS-Kernel).
+Extensions add rows (mosquitto, FreeRTOS-Kernel) when they bring them in.

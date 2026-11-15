@@ -1,0 +1,335 @@
+{
+ "schema": 1,
+ "generated_utc": "2026-11-15T20:47:48Z",
+ "git_commit": "8a4aa34",
+ "metrics": {
+  "guest_tests_passed": {
+   "value": 98,
+   "unit": "count",
+   "target": "report",
+   "pass": true,
+   "meaning": "In-guest tests that passed on the emulated board",
+   "source": "make test-qemu, summary.json"
+  },
+  "guest_tests_failed": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "In-guest tests that failed, errored or were skipped",
+   "source": "make test-qemu, summary.json"
+  },
+  "host_tests_passed": {
+   "value": 76,
+   "unit": "count",
+   "target": "report",
+   "pass": true,
+   "meaning": "Unit, integration and simulation checks on the host",
+   "source": "make test-host"
+  },
+  "host_tests_failed": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Host checks that failed",
+   "source": "make test-host"
+  },
+  "kunit_cases_passed": {
+   "value": 5,
+   "unit": "count",
+   "target": "== 5",
+   "pass": true,
+   "meaning": "Kernel-level checks of the conversion math (all KUnit cases)",
+   "source": "phase 3, test_kunit.py"
+  },
+  "driver_load_unload_cycles": {
+   "value": 500,
+   "unit": "count",
+   "target": ">= 500",
+   "pass": true,
+   "meaning": "Times the driver was loaded and removed without a problem",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "kmemleak_reports": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Memory blocks our driver allocated and never freed",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "kasan_reports": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Invalid memory accesses (use-after-free, out of bounds)",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "lockdep_reports": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Locking mistakes that could deadlock",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "concurrent_read_errors": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Wrong or failed readings with 8 threads reading at once",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "driver_read_latency_median_us": {
+   "value": 1221,
+   "unit": "us",
+   "target": "report",
+   "pass": true,
+   "meaning": "Time for one temperature read on the emulated board (median; relative only)",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "driver_read_latency_p99_us": {
+   "value": 4921,
+   "unit": "us",
+   "target": "report",
+   "pass": true,
+   "meaning": "Time for one temperature read on the emulated board (p99; relative only)",
+   "source": "phase 4, test_driver_robustness.py / test_memory.py"
+  },
+  "checkpatch_errors": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Kernel coding-style errors",
+   "source": "phase 4, static_analysis.sh"
+  },
+  "checkpatch_warnings": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Kernel coding-style warnings (allowed types excluded)",
+   "source": "phase 4, static_analysis.sh"
+  },
+  "sparse_warnings": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Kernel type-checking problems",
+   "source": "phase 4, static_analysis.sh"
+  },
+  "mutation_score": {
+   "value": "3/3",
+   "unit": "killed/total",
+   "target": "== 3/3",
+   "pass": true,
+   "meaning": "Deliberately inserted bugs that the tests caught",
+   "source": "phase 4, run_mutation.sh"
+  },
+  "cppcheck_findings": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Likely bugs in user-space C found without running it",
+   "source": "phase 5, test_host.sh"
+  },
+  "core_line_coverage_pct": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 95",
+   "pass": true,
+   "meaning": "Share of control-core lines exercised by unit tests",
+   "source": "phase 5, gcovr"
+  },
+  "core_branch_coverage_pct": {
+   "value": 98.9,
+   "unit": "%",
+   "target": ">= 90",
+   "pass": true,
+   "meaning": "Share of control-core branches exercised by unit tests",
+   "source": "phase 5, gcovr"
+  },
+  "sanitizer_errors": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Memory and undefined-behavior errors found by ASan/UBSan",
+   "source": "phase 5, test_host.sh"
+  },
+  "valgrind_errors": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Memory errors found by Valgrind",
+   "source": "phase 5, test_host.sh"
+  },
+  "valgrind_leaked_bytes": {
+   "value": 0,
+   "unit": "bytes",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Memory leaked (definitely or indirectly lost) in user-space code",
+   "source": "phase 5"
+  },
+  "sil_comfort_pct_hot_day": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 98",
+   "pass": true,
+   "meaning": "Share of time the simulated room stayed within 18.5..27.5 C",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_hot_day_product": {
+   "value": 2.83,
+   "unit": "per hour",
+   "target": "< 592.2",
+   "pass": true,
+   "meaning": "How often the compressor starts (fewer is gentler)",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_hot_day_baseline": {
+   "value": 592.2,
+   "unit": "per hour",
+   "target": "report",
+   "pass": true,
+   "meaning": "Compressor starts per hour of the naive baseline controller",
+   "source": "phase 5, sil"
+  },
+  "sil_short_cycle_violations_hot_day": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Compressor restarts that came too soon",
+   "source": "phase 5, sil"
+  },
+  "sil_comfort_pct_cold_day": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 98",
+   "pass": true,
+   "meaning": "Share of time the simulated room stayed within 18.5..27.5 C",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_cold_day_product": {
+   "value": 0.0,
+   "unit": "per hour",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "How often the compressor starts (fewer is gentler)",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_cold_day_baseline": {
+   "value": 0.0,
+   "unit": "per hour",
+   "target": "report",
+   "pass": true,
+   "meaning": "Compressor starts per hour of the naive baseline controller",
+   "source": "phase 5, sil"
+  },
+  "sil_short_cycle_violations_cold_day": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Compressor restarts that came too soon",
+   "source": "phase 5, sil"
+  },
+  "sil_comfort_pct_mild_day": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 98",
+   "pass": true,
+   "meaning": "Share of time the simulated room stayed within 18.5..27.5 C",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_mild_day_product": {
+   "value": 0.5,
+   "unit": "per hour",
+   "target": "< 113.5",
+   "pass": true,
+   "meaning": "How often the compressor starts (fewer is gentler)",
+   "source": "phase 5, sil"
+  },
+  "sil_starts_per_hour_mild_day_baseline": {
+   "value": 113.5,
+   "unit": "per hour",
+   "target": "report",
+   "pass": true,
+   "meaning": "Compressor starts per hour of the naive baseline controller",
+   "source": "phase 5, sil"
+  },
+  "sil_short_cycle_violations_mild_day": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Compressor restarts that came too soon",
+   "source": "phase 5, sil"
+  },
+  "modbus_roundtrip_median_ms": {
+   "value": 2.09,
+   "unit": "ms",
+   "target": "report",
+   "pass": true,
+   "meaning": "Time for a Modbus request and reply on the emulated board",
+   "source": "phase 6, test_daemon_e2e.py"
+  },
+  "fault_detection_latency_s": {
+   "value": 0.12,
+   "unit": "s",
+   "target": "<= 1.6",
+   "pass": true,
+   "meaning": "Time from sensor loss to alarm visible over Modbus (target 3 x 0.2 s + 1 s)",
+   "source": "phase 6, test_daemon_e2e.py"
+  },
+  "hvacd_rss_kb": {
+   "value": 1396,
+   "unit": "kB",
+   "target": "report",
+   "pass": true,
+   "meaning": "Daemon memory use after 30 s",
+   "source": "phase 6, test_daemon_e2e.py"
+  },
+  "hvacd_binary_bytes": {
+   "value": 26480,
+   "unit": "bytes",
+   "target": "report",
+   "pass": true,
+   "meaning": "Daemon program size (stripped)",
+   "source": "phase 6, test_daemon_e2e.py"
+  },
+  "guest_boot_to_tests_s": {
+   "value": 8.7,
+   "unit": "s",
+   "target": "report",
+   "pass": true,
+   "meaning": "Seconds from kernel start to the start of the guest tests",
+   "source": "phase 1"
+  },
+  "build_duration_min": {
+   "value": 5.9,
+   "unit": "min",
+   "target": "report",
+   "pass": true,
+   "meaning": "Duration of the last full (from empty output folder) image build",
+   "source": "build.sh"
+  },
+  "rootfs_size_mb": {
+   "value": 55,
+   "unit": "MB",
+   "target": "report",
+   "pass": true,
+   "meaning": "Space used by the root filesystem image",
+   "source": "build.sh"
+  }
+ }
+}

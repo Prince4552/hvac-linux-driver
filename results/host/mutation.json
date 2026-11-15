@@ -1,2 +1,2 @@
 {"schema": 1, "killed": 3, "total": 3, "mutation_score": "3/3",
- "mutants": [{"mutant": "01-no-sign-extension", "status": "killed", "failing_tests": 11},{"mutant": "02-no-byte-swap", "status": "killed", "failing_tests": 25},{"mutant": "03-no-range-check", "status": "killed", "failing_tests": 4}]}
+ "mutants": [{"mutant": "01-no-sign-extension", "status": "killed", "failing_tests": 11},{"mutant": "02-no-byte-swap", "status": "killed", "failing_tests": 29},{"mutant": "03-no-range-check", "status": "killed", "failing_tests": 4}]}

@@ -321,3 +321,22 @@ Format (newest at the bottom):
   room temperature must start cooling), then check that an invalid write restores the applied values.
 - Reason: a test must fail when the behavior is missing.
 - Consequences: none for the daemon (its behavior was correct and matches section 4.6).
+
+## D-026: Metrics and CI details
+- Date / phase: 2026-11-15, Phase 7
+- Context: sections 4.9, 7 (Phase 7) and 9 leave a few details open.
+- Decision:
+  1. `sil_starts_per_hour_<scenario>_product` has target "< baseline" when the baseline started the
+     compressor at all. On the cold day neither controller cools (0 and 0), so the target becomes "== 0".
+     "Fewer than zero" cannot apply when there is no cooling demand.
+  2. `build_duration_min` is the duration of the last *full* build, one that starts from an empty
+     Buildroot output folder. The download cache and ccache may be warm, which the report states.
+     `build.sh` records it as `full_build_duration_min`; incremental builds keep the old value.
+  3. CI uses Python 3.14 (`actions/setup-python`), the same as the development host, so the fully pinned
+     `requirements-host.txt` installs identically. The C toolchain and analyzers come from Ubuntu 24.04.
+  4. The CI cache key covers `VERSIONS.md`, the defconfig and the kernel fragment. The Buildroot tarball
+     is cached too.
+  5. Guest metrics may carry an optional target (used by extensions); `collect_metrics.py` picks up any
+     metric with a target that it does not already know.
+- Reason: simplest choices that keep every target meaningful and CI reproducible.
+- Consequences: none.
