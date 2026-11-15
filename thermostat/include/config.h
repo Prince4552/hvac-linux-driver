@@ -32,6 +32,10 @@ typedef struct {
 	uint16_t modbus_port;			/* 1..65535, default 502 */
 	uint32_t modbus_max_clients;		/* 1..8, default 4 */
 	config_log_level_t log_level;		/* default info */
+	/* Ext 1: watchdog supervision */
+	uint32_t watchdog_enabled;		/* 0 or 1, default 0 */
+	char watchdog_device[CONFIG_PATH_MAX];	/* default /dev/watchdog */
+	uint32_t watchdog_timeout_s;		/* 2..60, default 10 */
 } hvacd_config_t;
 
 /** Fills cfg with every default from section 4.5. */

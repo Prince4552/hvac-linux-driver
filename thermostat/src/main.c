@@ -3,7 +3,9 @@
  * hvacd: the thermostat daemon (PROJECT_PLAN.md section 4.7). Single-threaded: one select() loop
  * serves Modbus clients between control ticks. Each tick: apply Modbus setpoint writes, read the
  * sensor, run hvac_core_step(), apply (log) the outputs, refresh the Modbus register table.
- * Exit codes: 0 clean shutdown (SIGINT/SIGTERM), 1 configuration or start-up error, 2 fatal error.
+ * With watchdog_enabled, the watchdog is kicked after every completed tick (Ext 1), so a hung loop
+ * lets it expire. Exit codes: 0 clean shutdown (SIGINT/SIGTERM), 1 configuration or start-up error,
+ * 2 fatal error.
  */
 #include <errno.h>
 #include <signal.h>
@@ -18,6 +20,7 @@
 #include "modbus_regs.h"
 #include "modbus_server.h"
 #include "sensor_iio.h"
+#include "watchdog.h"
 
 #define HVACD_VERSION "1.0.0"
 #define EXIT_OK 0
@@ -37,6 +40,7 @@ typedef struct {
 	sensor_iio_t sensor;
 	mb_server_t mb;
 	mb_status_t status;
+	wdt_t wdt;
 	bool sensor_ok;		/* result of the previous read, to log changes only */
 	uint64_t start_ms;
 } app_t;
@@ -108,6 +112,17 @@ static int app_start(const char *config_path)
 		log_msg(LOG_ERROR, "cannot listen on Modbus TCP port %u: %s", app.cfg.modbus_port,
 			strerror(-ret));
 		return ret;
+	}
+	if (app.cfg.watchdog_enabled != 0u) {
+		ret = wdt_open(&app.wdt, app.cfg.watchdog_device, app.cfg.watchdog_timeout_s);
+		if (ret != 0) {
+			log_msg(LOG_ERROR, "cannot open watchdog %s: %s", app.cfg.watchdog_device,
+				strerror(-ret));
+			mb_server_close(&app.mb);
+			return ret;
+		}
+		log_msg(LOG_INFO, "watchdog %s armed, timeout %u s", app.cfg.watchdog_device,
+			app.cfg.watchdog_timeout_s);
 	}
 	app.start_ms = mono_ms();
 	app.sensor_ok = true;
@@ -229,6 +244,9 @@ static int run_loop(void)
 
 		if (now >= next_tick) {
 			control_tick(now);
+			/* Kick only after a completed control step: a hung loop stops the kicks. */
+			if (app.wdt.fd >= 0 && wdt_kick(&app.wdt) != 0)
+				log_msg(LOG_WARN, "watchdog kick failed");
 			next_tick += period;
 			if (next_tick <= now)
 				next_tick = now + period;	/* fell behind: skip, never burst */
@@ -264,11 +282,13 @@ int main(int argc, char **argv)
 		(void)fprintf(stderr, "hvacd: cannot install signal handlers\n");
 		return EXIT_STARTUP;
 	}
-	/* On failure app_start() has nothing open: the Modbus server is its last step and
-	 * mb_server_open() cleans up after itself. */
+	wdt_init(&app.wdt);
+	/* On failure app_start() leaves nothing open: it closes what it opened before failing. */
 	if (app_start(argv[2]) != 0)
 		return EXIT_STARTUP;
 	code = run_loop();
+	if (wdt_close_clean(&app.wdt) != 0)
+		log_msg(LOG_WARN, "watchdog magic close failed; the system may reset");
 	mb_server_close(&app.mb);
 	return code;
 }

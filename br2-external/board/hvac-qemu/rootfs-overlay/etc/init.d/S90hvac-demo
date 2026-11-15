@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
 # Demo mode (normal boot, not autotest): loads the simulated chip (i2c-stub at 0x48) set to 25 C,
-# loads the hvac_temp driver, creates the device, and starts hvacd in the background with
+# loads the hvac_temp driver and softdog, creates the device, and starts hvacd in the background with
 # /etc/hvacd.conf, logging to /var/log/hvacd.log. Modbus TCP is then on port 502 (5020 on the host).
 # Does nothing when the kernel command line contains hvac_autotest=1.
 set -eu
@@ -36,6 +36,7 @@ start() {
 	i2cset -y "${bus}" "${CHIP_ADDR}" 0x00 "${TEMP_25C_SWAPPED}" w
 	modprobe hvac_temp
 	echo "hvac_temp ${CHIP_ADDR}" > "/sys/bus/i2c/devices/i2c-${bus}/new_device"
+	modprobe softdog # provides /dev/watchdog for hvacd's watchdog supervision (Ext 1)
 	echo "S90hvac-demo: starting hvacd (log: ${LOGFILE})"
 	start-stop-daemon -S -b -m -p "${PIDFILE}" -x /bin/sh -- \
 		-c "exec /usr/sbin/hvacd --config /etc/hvacd.conf >> ${LOGFILE} 2>&1"

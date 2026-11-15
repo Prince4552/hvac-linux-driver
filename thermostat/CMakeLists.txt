@@ -34,7 +34,7 @@ target_include_directories(hvac_core PUBLIC include)
 target_compile_options(hvac_core PRIVATE ${HVAC_WARNINGS})
 
 # Daemon modules that do not need libmodbus (unit-testable on their own).
-add_library(hvacd_support STATIC src/sensor_iio.c src/modbus_regs.c src/log.c)
+add_library(hvacd_support STATIC src/sensor_iio.c src/modbus_regs.c src/log.c src/watchdog.c)
 target_link_libraries(hvacd_support PUBLIC hvac_core)
 target_compile_options(hvacd_support PRIVATE ${HVAC_WARNINGS})
 
@@ -53,7 +53,7 @@ if(HVAC_BUILD_TESTS)
 	add_library(unity STATIC third_party/unity/unity.c)
 	target_include_directories(unity PUBLIC third_party/unity)
 
-	foreach(t test_hvac_core test_config test_sensor_iio test_modbus_regs)
+	foreach(t test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog)
 		add_executable(${t} tests/${t}.c)
 		target_link_libraries(${t} PRIVATE hvacd_support unity)
 		target_compile_options(${t} PRIVATE ${HVAC_WARNINGS})

@@ -18,7 +18,7 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 5 | Thermostat control core and simulation | done | `make test-all`: host 52 unit tests x3 (normal/ASan+UBSan/Valgrind) + SIL checks, guest 90/90, 0 skipped | `phase 5: Thermostat control core and simulation` / `phase-5` |
 | 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | done | `make test-all`: host 76/76 (67 unit x3 + 9 integration), guest 98/98, 0 skipped | `phase 6: Thermostat daemon on the board` / `phase-6` |
 | 7 | CI, metrics, documentation, publishing (v1.0.0) | in progress | `make test-all && make mutation && make metrics`: host 76/76, guest 98/98, 0 skipped, mutation 3/3, 41/41 metrics on target; CI: pending | `phase 7: CI, metrics, documentation, publishing` / `phase-7` |
-| Ext 1 | Watchdog supervision | not started | | |
+| Ext 1 | Watchdog supervision | done (push pending Phase 7 CI) | `make test-all`: host 81/81, guest 101/101, 0 skipped | `ext 1: Watchdog supervision` / `ext-1` |
 | Ext 2 | Fault detection and diagnostics | not started | | |
 | Ext 3 | MQTT telemetry | not started | | |
 | Ext 4 | Control core on FreeRTOS (v1.1.0) | not started | | |
@@ -63,6 +63,7 @@ log file path, what you need from the user.)
 - Phase 6: host 76 (67 unit + 9 integration), guest 98; fault detection 0.07 s; Modbus round trip 2.15 ms;
   hvacd RSS 1412 kB, binary 26480 bytes; Valgrind 0 errors.
 - Phase 7: clean full build 5.9 min (warm caches); 41/41 metrics on target; mutation 3/3 (11/29/4).
+- Ext 1: watchdog trigger latency 1.94 s (timeout 2 s); host 81, guest 101.
 
 ## Publishing
 

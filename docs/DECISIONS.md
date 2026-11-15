@@ -340,3 +340,27 @@ Format (newest at the bottom):
      metric with a target that it does not already know.
 - Reason: simplest choices that keep every target meaningful and CI reproducible.
 - Consequences: none.
+
+## D-027: Watchdog details (Ext 1)
+- Date / phase: 2026-11-15, Ext 1
+- Context: the plan names `wdt_open(path, timeout_s)`, `wdt_kick()`, `wdt_close_clean()` and says to kick
+  "only after a successful control step".
+- Decision:
+  1. The three functions take a `wdt_t *` handle (plus `wdt_init()`), instead of hiding a global file
+     descriptor. This keeps them testable and follows the "no hidden global state" spirit of the rules.
+  2. "Successful control step" means the tick ran to completion (setpoints, sensor read, core step,
+     publish). A *sensor* fault is a successful step: the software is alive and is correctly reporting
+     FAULT. The watchdog is about the software hanging, not about the sensor.
+  3. The kick uses the `WDIOC_KEEPALIVE` ioctl; the timeout is set with `WDIOC_SETTIMEOUT`; clean
+     shutdown writes `V` before closing (magic close). If the timeout ioctl fails at start-up, the device
+     is closed with magic close before returning the error, so no armed watchdog is left behind.
+  4. Tests use `watchdog_timeout_s = 2` so the three guest tests take seconds, not minutes.
+  5. The expiry text `softdog: Triggered - Reboot ignored` was read from
+     `drivers/watchdog/softdog.c` of Linux 6.18.7 (`pr_crit("Triggered - Reboot ignored\n")` with the
+     `softdog: ` prefix).
+  6. The board's `/etc/hvacd.conf` enables the watchdog (the compiled-in default stays 0), and the demo
+     init script loads `softdog` (default options, so a hang would really reboot the demo board).
+- Consequences: `metrics.json` gains `watchdog_trigger_latency_s` (target `<= 5`).
+  (Addendum after the first run: the guest test's cleanup disarms the watchdog with its own magic close
+  before unloading `softdog`, because a daemon ended with SIGKILL leaves the watchdog running and the
+  kernel then refuses to unload the module. That is the intended safety behavior, not a bug.)

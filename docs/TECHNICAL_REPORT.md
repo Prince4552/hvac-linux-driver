@@ -234,8 +234,14 @@ Evidence:
 
 ## 8. Extensions
 
-*(Added by the extension phases: watchdog supervision, fault detection and diagnostics, MQTT
-telemetry, and the control core on FreeRTOS.)*
+### 8.1 Watchdog supervision (Ext 1)
+
+A watchdog timer resets the board unless the software regularly proves it is alive. `hvacd` arms
+`/dev/watchdog` at start-up. It "kicks" it after every completed control step, never from a separate
+timer, so a hung loop really does stop the kicks. On a clean shutdown it writes the "magic close"
+character `V`, which tells the kernel the stop is intentional. The tests use the kernel's software
+watchdog in a mode that only logs instead of rebooting. A healthy daemon never triggers it. A daemon
+frozen with `SIGSTOP` triggers it after **1.94 s** (timeout 2 s). A clean shutdown leaves it quiet.
 
 ## 9. How to reproduce
 

@@ -45,7 +45,8 @@ def read_metrics(metrics_dir: str) -> dict:
         if fname.endswith(".json"):
             with open(os.path.join(metrics_dir, fname), encoding="utf-8") as f:
                 entry = json.load(f)
-            metrics[entry["name"]] = {k: entry[k] for k in ("value", "unit", "meaning")}
+            metrics[entry["name"]] = {k: entry[k] for k in ("value", "unit", "meaning", "target")
+                                      if k in entry}
     return metrics
 
 

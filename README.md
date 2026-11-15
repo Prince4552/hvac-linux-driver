@@ -81,6 +81,12 @@ Key numbers from `make test-all`, `make mutation` and `make metrics`. All metric
 Bottom: a naive thermostat holds 26 °C but switches the compressor on and off every few seconds, which
 wears it out.*
 
+## Extensions
+
+| Extension | What it adds | Key result |
+| --- | --- | --- |
+| Ext 1: watchdog | `hvacd` kicks `/dev/watchdog` after each control step; magic close on shutdown | frozen daemon detected in 1.94 s (timeout 2 s) |
+
 ## Repository map
 
 | Folder | Contents |

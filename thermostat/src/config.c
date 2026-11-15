@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "watchdog.h"
+
 #define CONFIG_LINE_MAX 256u
 
 typedef enum { KIND_INT, KIND_TEXT, KIND_LOG_LEVEL } value_kind_t;
@@ -22,6 +24,7 @@ typedef enum {
 	KEY_COOL_SETPOINT, KEY_HEAT_SETPOINT, KEY_DEADBAND, KEY_MIN_OFF, KEY_MIN_RUN,
 	KEY_FAULT_RECOVER, KEY_MAX_STEP, KEY_LOOP_PERIOD, KEY_IIO_BASE_DIR, KEY_IIO_DEVICE_NAME,
 	KEY_MODBUS_PORT, KEY_MODBUS_MAX_CLIENTS, KEY_LOG_LEVEL,
+	KEY_WATCHDOG_ENABLED, KEY_WATCHDOG_DEVICE, KEY_WATCHDOG_TIMEOUT,
 	KEY_COUNT
 } key_id_t;
 
@@ -47,6 +50,10 @@ static const key_spec_t KEYS[KEY_COUNT] = {
 	[KEY_MODBUS_PORT] = { "modbus_port", KIND_INT, 1, 65535 },
 	[KEY_MODBUS_MAX_CLIENTS] = { "modbus_max_clients", KIND_INT, 1, 8 },
 	[KEY_LOG_LEVEL] = { "log_level", KIND_LOG_LEVEL, 0, 0 },
+	[KEY_WATCHDOG_ENABLED] = { "watchdog_enabled", KIND_INT, 0, 1 },
+	[KEY_WATCHDOG_DEVICE] = { "watchdog_device", KIND_TEXT, 0, 0 },
+	[KEY_WATCHDOG_TIMEOUT] = { "watchdog_timeout_s", KIND_INT, WDT_TIMEOUT_MIN_S,
+				   WDT_TIMEOUT_MAX_S },
 };
 
 static const char *const LOG_LEVEL_NAMES[] = { "error", "warn", "info", "debug" };
@@ -91,6 +98,9 @@ void config_set_defaults(hvacd_config_t *cfg)
 	cfg->modbus_port = 502u;
 	cfg->modbus_max_clients = 4u;
 	cfg->log_level = CONFIG_LOG_INFO;
+	cfg->watchdog_enabled = 0u;
+	(void)snprintf(cfg->watchdog_device, sizeof(cfg->watchdog_device), "%s", "/dev/watchdog");
+	cfg->watchdog_timeout_s = 10u;
 }
 
 const char *config_log_level_name(config_log_level_t level)
@@ -135,6 +145,8 @@ static void store_int(hvacd_config_t *cfg, key_id_t id, int64_t v)
 	case KEY_LOOP_PERIOD: cfg->loop_period_ms = (uint32_t)v; break;
 	case KEY_MODBUS_PORT: cfg->modbus_port = (uint16_t)v; break;
 	case KEY_MODBUS_MAX_CLIENTS: cfg->modbus_max_clients = (uint32_t)v; break;
+	case KEY_WATCHDOG_ENABLED: cfg->watchdog_enabled = (uint32_t)v; break;
+	case KEY_WATCHDOG_TIMEOUT: cfg->watchdog_timeout_s = (uint32_t)v; break;
 	default: break;	/* not an integer key */
 	}
 }
@@ -158,9 +170,18 @@ static int apply_int(parse_state_t *ps, hvacd_config_t *cfg, key_id_t id, const 
 
 static int apply_text(parse_state_t *ps, hvacd_config_t *cfg, key_id_t id, const char *value)
 {
-	char *dest = id == KEY_IIO_BASE_DIR ? cfg->iio_base_dir : cfg->iio_device_name;
-	size_t size = id == KEY_IIO_BASE_DIR ? sizeof(cfg->iio_base_dir) : sizeof(cfg->iio_device_name);
-	int n = snprintf(dest, size, "%s", value);
+	char *dest = cfg->iio_device_name;
+	size_t size = sizeof(cfg->iio_device_name);
+	int n = 0;
+
+	if (id == KEY_IIO_BASE_DIR) {
+		dest = cfg->iio_base_dir;
+		size = sizeof(cfg->iio_base_dir);
+	} else if (id == KEY_WATCHDOG_DEVICE) {
+		dest = cfg->watchdog_device;
+		size = sizeof(cfg->watchdog_device);
+	}
+	n = snprintf(dest, size, "%s", value);
 
 	if (n < 0 || (size_t)n >= size)
 		return fail(ps, "value for '%s' is longer than %zu characters", KEYS[id].name, size - 1);

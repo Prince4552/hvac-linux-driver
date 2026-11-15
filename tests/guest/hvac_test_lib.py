@@ -240,12 +240,17 @@ def wait_until(predicate: Callable[[], bool], timeout_s: float,
         time.sleep(interval_s)
 
 
-def record_metric(name: str, value: object, unit: str, meaning: str) -> None:
-    """Saves one metric as /tmp/hvac-results/metrics/<name>.json for the result summary."""
+def record_metric(name: str, value: object, unit: str, meaning: str,
+                  target: Optional[str] = None) -> None:
+    """Saves one metric as /tmp/hvac-results/metrics/<name>.json for the result summary.
+    target (for example "<= 5") is optional; extension metrics use it (see collect_metrics.py)."""
     metrics_dir = os.path.join(RESULTS_DIR, "metrics")
     os.makedirs(metrics_dir, exist_ok=True)
+    entry: dict[str, object] = {"name": name, "value": value, "unit": unit, "meaning": meaning}
+    if target is not None:
+        entry["target"] = target
     with open(os.path.join(metrics_dir, f"{name}.json"), "w", encoding="utf-8") as f:
-        json.dump({"name": name, "value": value, "unit": unit, "meaning": meaning}, f)
+        json.dump(entry, f)
 
 
 def record_boot_metric() -> None:

@@ -4,8 +4,8 @@
  "core_branch_coverage_pct": 98.9,
  "files": {
   "config.c": {
-   "line_pct": 98.1,
-   "branch_pct": 93.3
+   "line_pct": 98.3,
+   "branch_pct": 93.4
   },
   "hvac_core.c": {
    "line_pct": 100.0,
@@ -30,6 +30,10 @@
   "sensor_iio.c": {
    "line_pct": 95.9,
    "branch_pct": 77.1
+  },
+  "watchdog.c": {
+   "line_pct": 87.9,
+   "branch_pct": 71.4
   }
  },
  "failures": []

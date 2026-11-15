@@ -137,6 +137,17 @@ def test_bad_config_exits_one_with_message(tmp_path: Path) -> None:
     assert "config:2: unknown key 'cool_setpont_mc'" in proc.stderr
 
 
+def test_bad_watchdog_device_exits_one_with_message(tmp_path: Path, fake: FakeIio) -> None:
+    """Ext 1: a watchdog that cannot be opened is a start-up error, not something to ignore."""
+    conf = config_for(tmp_path, fake)
+    with open(conf, "a", encoding="utf-8") as f:
+        f.write("watchdog_enabled = 1\nwatchdog_device = /nonexistent/watchdog\n")
+    proc = subprocess.run([str(HVACD), "--config", str(conf)], capture_output=True, text=True,
+                          timeout=10)
+    assert proc.returncode == 1
+    assert "cannot open watchdog /nonexistent/watchdog: No such file or directory" in proc.stderr
+
+
 def test_version_and_help() -> None:
     out = subprocess.run([str(HVACD), "--version"], capture_output=True, text=True, timeout=10)
     assert out.returncode == 0 and out.stdout.startswith("hvacd ")
