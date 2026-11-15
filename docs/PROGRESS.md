@@ -15,8 +15,8 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 2 | Driver skeleton and hello module | done | `make test-all`: host lint clean, guest 40/40, 0 skipped | `phase 2: Driver skeleton and hello module` / `phase-2` |
 | 3 | Complete driver (IIO, conversion, alarms, KUnit) | done | `make test-all`: host lint clean, guest 83/83, 0 skipped | `phase 3: Complete driver` / `phase-3` |
 | 4 | Driver hardening (robustness, memory, static analysis, mutation) | done | `make test-all && make mutation`: lint + static clean, guest 90/90, 0 skipped, mutation 3/3 | `phase 4: Driver hardening` / `phase-4` |
-| 5 | Thermostat control core and simulation | in progress | | |
-| 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | not started | | |
+| 5 | Thermostat control core and simulation | done | `make test-all`: host 52 unit tests x3 (normal/ASan+UBSan/Valgrind) + SIL checks, guest 90/90, 0 skipped | `phase 5: Thermostat control core and simulation` / `phase-5` |
+| 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | in progress | | |
 | 7 | CI, metrics, documentation, publishing (v1.0.0) | not started | | |
 | Ext 1 | Watchdog supervision | not started | | |
 | Ext 2 | Fault detection and diagnostics | not started | | |
@@ -27,15 +27,18 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 5 (Thermostat control core and simulation)
+Phase: 6 (Thermostat daemon on the board)
 
-Phase 4 task checklist (done):
+Phase 5 task checklist (done):
 
-- [x] `test_driver_robustness.py`: concurrent reads, reads + writes, 500 load/unload cycles, remove while reading
-- [x] `test_memory.py`: kmemleak (200 cycles), KASAN/lockdep silent, read latency
-- [x] `scripts/static_analysis.sh` (checkpatch + sparse, both proven to detect planted bugs), called by `make test-qemu`
-- [x] Mutants 01-03 + `scripts/run_mutation.sh` (`make mutation`), score 3/3; no-mutex rationale D-020
-- [x] Gate; learning note `docs/phases/phase-04-driver-hardening.md`; D-019, D-020
+- [x] `thermostat/` CMake project (C11, strict flags, `HVAC_SANITIZE`, `HVAC_COVERAGE`)
+- [x] Unity v2.7.0 vendored with license
+- [x] `hvac_core.c` (section 4.4), `config.c` (parse string + load file, 8 KB); D-021, D-022
+- [x] `test_hvac_core.c` (34), `test_config.c` (18)
+- [x] Room simulator, baseline controller, metrics, `sil` (integer micro-degrees); D-023
+- [x] `scripts/plot_sil.py` -> `docs/images/sil_hot_day.png`
+- [x] `scripts/test_host.sh`: lint, cppcheck, unit x3, coverage thresholds, SIL + checks
+- [x] Gate; learning note `docs/phases/phase-05-control-core.md`
 
 Work prepared ahead (not committed yet, belongs to later phases): Phase 2/3/4 driver code and tests
 staged; `thermostat/` core, config, simulator and unit tests (Phase 5); daemon modules, Modbus client and
@@ -59,6 +62,9 @@ log file path, what you need from the user.)
 - Phase 3: guest 83/83; KUnit 5/5 cases (`kunit_cases_passed` = 5).
 - Phase 4: guest 90/90; kmemleak/KASAN/lockdep reports 0/0/0; concurrent read errors 0; 500 load/unload
   cycles; checkpatch 0/0, sparse 0; mutation 3/3; read latency median ~1.1 ms (emulated).
+- Phase 5: host unit tests 52 (normal, ASan+UBSan, Valgrind all clean); cppcheck 0; coverage hvac_core.c
+  100 % lines / 98.9 % branches, config.c 98.1 % lines; SIL hot day product 2.83 starts/h vs baseline
+  592.2, 0 short cycles, comfort 100 % in all scenarios.
 
 ## Publishing
 

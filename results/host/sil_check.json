@@ -1,0 +1,85 @@
+{
+ "schema": 1,
+ "checks_failed": 0,
+ "failures": [],
+ "runs": [
+  {
+   "scenario": "hot_day",
+   "controller": "product",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 9.8,
+   "compressor_starts": 68,
+   "compressor_starts_per_hour": 2.83,
+   "short_cycle_violations": 0,
+   "min_off_gap_s": 418,
+   "compressor_duty_pct": 52.13,
+   "max_overshoot_mc": 0
+  },
+  {
+   "scenario": "hot_day",
+   "controller": "baseline",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 9.8,
+   "compressor_starts": 14213,
+   "compressor_starts_per_hour": 592.2,
+   "short_cycle_violations": 14212,
+   "min_off_gap_s": 1,
+   "compressor_duty_pct": 52.03,
+   "max_overshoot_mc": 0
+  },
+  {
+   "scenario": "cold_day",
+   "controller": "product",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 20.4,
+   "compressor_starts": 0,
+   "compressor_starts_per_hour": 0.0,
+   "short_cycle_violations": 0,
+   "min_off_gap_s": null,
+   "compressor_duty_pct": 0.0,
+   "max_overshoot_mc": 0
+  },
+  {
+   "scenario": "cold_day",
+   "controller": "baseline",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 20.4,
+   "compressor_starts": 0,
+   "compressor_starts_per_hour": 0.0,
+   "short_cycle_violations": 0,
+   "min_off_gap_s": null,
+   "compressor_duty_pct": 0.0,
+   "max_overshoot_mc": 0
+  },
+  {
+   "scenario": "mild_day",
+   "controller": "product",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 0.0,
+   "compressor_starts": 12,
+   "compressor_starts_per_hour": 0.5,
+   "short_cycle_violations": 0,
+   "min_off_gap_s": 1489,
+   "compressor_duty_pct": 5.05,
+   "max_overshoot_mc": 0
+  },
+  {
+   "scenario": "mild_day",
+   "controller": "baseline",
+   "seed": 1,
+   "comfort_pct": 100.0,
+   "time_to_comfort_min": 0.0,
+   "compressor_starts": 2724,
+   "compressor_starts_per_hour": 113.5,
+   "short_cycle_violations": 2720,
+   "min_off_gap_s": 1,
+   "compressor_duty_pct": 5.46,
+   "max_overshoot_mc": 0
+  }
+ ]
+}

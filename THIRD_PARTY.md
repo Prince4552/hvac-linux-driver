@@ -14,6 +14,8 @@ into `.cache/` or installed on the host. Exact versions and checksums are in `VE
 | Linux kernel | Guest kernel, `i2c-stub`, IIO, KUnit | 6.18.7 | GPL-2.0 | no (`.cache/`) |
 | Bootlin toolchain | Cross-compiler (GCC, glibc) | aarch64 glibc stable 2025.08-1 | GPL / LGPL (per component) | no (`.cache/`) |
 | BusyBox, i2c-tools, Python 3, pytest, libmodbus | Guest user space | as pinned by Buildroot 2026.02.3 | GPL-2.0 / GPL-2.0 / PSF / MIT / LGPL-2.1 | no (`.cache/`) |
+| Unity | C unit-test framework | v2.7.0 | MIT | **yes**, `thermostat/third_party/unity/` (unchanged copy + license) |
+| cppcheck, Valgrind, GCC sanitizers, gcov | Host checks | host packages | GPL (tools only, nothing linked into our code) | no (host) |
 | QEMU | Emulates the ARM64 board | host package (`qemu-system-arm`) | GPL-2.0 | no (host) |
 
 Rows are added as phases bring in new components (Buildroot, Linux, toolchain, Unity, libmodbus,

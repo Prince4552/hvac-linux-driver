@@ -12,17 +12,17 @@
    "meaning": "Times the driver was loaded, used and removed without a problem"
   },
   "driver_read_latency_median_us": {
-   "value": 1134,
+   "value": 1131,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (median); relative numbers only"
   },
   "driver_read_latency_p99_us": {
-   "value": 4406,
+   "value": 4250,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (99th percentile); relative numbers only"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.9,
+   "value": 8.4,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
   },

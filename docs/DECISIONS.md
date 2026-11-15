@@ -232,3 +232,55 @@ Format (newest at the bottom):
 - Alternatives considered: adding delays inside the driver to widen the race (changes the code under test).
 - Consequences: mutation score target 3/3.
 
+## D-021: Control core: small additions and one known limitation
+- Date / phase: 2026-11-15, Phase 5
+- Context: section 4.4 fixes the core's interface and rules but not every helper or edge case.
+- Decision:
+  1. Added `hvac_config_set_defaults()` (fills the section 4.5 defaults) so the daemon, simulator, tests
+     and FreeRTOS port share one source of defaults. No existing interface changed.
+  2. `HVAC_TEMP_MIN_MC` / `HVAC_TEMP_MAX_MC` are defined again in `hvac_core.h` with the same values as
+     `driver/hvac_temp_conv.h`: kernel and user-space headers cannot include each other (`u16`, kernel macros).
+  3. NULL arguments: functions returning `int` give `-EINVAL`; `hvac_core_step()` returns `HVAC_STATE_FAULT`
+     without touching anything.
+  4. If the monotonic clock ever appears to go backwards, elapsed time counts as 0 (timers wait longer,
+     never shorter).
+- Known limitation (follows the plan exactly, documented rather than changed): the implausible-jump check
+  compares with the last *valid* reading. If the sensor is missing while the room changes by more than
+  `max_step_mc` (5 C), every new reading counts as a jump and the controller stays in FAULT until a
+  restart. That fails safe (alarm on, equipment off). Revisit if the plan changes.
+- Consequences: none for the public interface in section 4.4.
+
+## D-022: Configuration parser details
+- Date / phase: 2026-11-15, Phase 5
+- Context: section 4.5 does not cover duplicate keys, line length, or which line a cross-field error names.
+- Decision: a duplicate key is an error (`duplicate key 'x'`), like an unknown key, because it is almost
+  always a mistake. Lines are at most 255 characters and files at most 8192 bytes. A file with a NUL byte
+  is rejected. The band-ordering error is reported at the last line that set `cool_setpoint_mc`,
+  `heat_setpoint_mc` or `deadband_mc` (line 0 if none was set). File-level errors (cannot open, too
+  large) use line 0.
+- Reason: simplest rules that give a useful line number for every error.
+- Alternatives considered: "last value wins" for duplicates (hides typos).
+- Consequences: none.
+
+## D-023: Simulator definitions
+- Date / phase: 2026-11-15, Phase 5
+- Context: Phase 5 task 5 leaves some details of the room model and metrics open.
+- Decision:
+  1. Units: the simulator uses micro-degrees Celsius in `int64_t`, with suffix `_uc` (only inside `sim/`).
+  2. Solar half-sine without floating point: Bhaskara I's approximation
+     `sin(pi x) ~ 16x(1-x) / (5 - 4x(1-x))` (error below 0.2 %).
+  3. Sensor: noise uniform in [-100000, +100000] µ°C from xorshift32 (seed 1 unless given). The noisy
+     value is floored to a 62500 µ°C step (the chip's 0.0625 °C), then converted to millidegrees exactly
+     like the driver chain (`raw x 62.5`, rounded half away from zero).
+  4. Each second: read sensor, run controller, record metrics, then advance the room with the outputs.
+  5. Baseline: compressor on when the reading is above 26000, off when below; at exactly 26000 it keeps
+     its state (heater mirrored at 20000).
+  6. `comfort_pct`: share of seconds from the first in-band second to the end of the day in which the
+     true temperature is within 18.5..27.5 °C; 0 if the band is never entered.
+     `time_to_comfort_min`: minutes until that first in-band second (null if never).
+     `max_overshoot_mc`: largest distance outside 18.5..27.5 °C after first entering the band.
+     `min_off_gap_s`: smallest off time between two compressor runs (null with fewer than two starts).
+     `compressor_starts_per_hour`: starts / 24 h.
+  7. Percentages are kept as integer hundredths and printed with two decimals (no floating point in C).
+- Reason: simplest reading of the plan; every choice is deterministic so results are identical everywhere.
+- Consequences: the CSV is sampled every 10 s; the plot's shading therefore has 10 s resolution.

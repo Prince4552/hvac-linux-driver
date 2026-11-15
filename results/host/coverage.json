@@ -1,0 +1,16 @@
+{
+ "schema": 1,
+ "core_line_coverage_pct": 100.0,
+ "core_branch_coverage_pct": 98.9,
+ "files": {
+  "config.c": {
+   "line_pct": 98.1,
+   "branch_pct": 93.3
+  },
+  "hvac_core.c": {
+   "line_pct": 100.0,
+   "branch_pct": 98.9
+  }
+ },
+ "failures": []
+}
