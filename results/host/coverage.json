@@ -10,6 +10,26 @@
   "hvac_core.c": {
    "line_pct": 100.0,
    "branch_pct": 98.9
+  },
+  "log.c": {
+   "line_pct": 0.0,
+   "branch_pct": 0.0
+  },
+  "main.c": {
+   "line_pct": 0.0,
+   "branch_pct": 0.0
+  },
+  "modbus_regs.c": {
+   "line_pct": 100.0,
+   "branch_pct": 100.0
+  },
+  "modbus_server.c": {
+   "line_pct": 0.0,
+   "branch_pct": 0.0
+  },
+  "sensor_iio.c": {
+   "line_pct": 95.9,
+   "branch_pct": 77.1
   }
  },
  "failures": []

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Fast host tests (no QEMU). Creates .venv first if missing, so CI can call this script directly.
 # Steps: lint, cppcheck, unit tests (normal, ASan+UBSan, Valgrind), coverage with thresholds,
-# software-in-the-loop simulation with checks and plot. Each step writes a small JSON file to
+# software-in-the-loop simulation with checks and plot, daemon integration tests (pytest). Each step writes a small JSON file to
 # results/host/; host_summary.json totals them. Exits non-zero on the first failing step.
 set -euo pipefail
 
@@ -13,7 +13,7 @@ OUT="${ROOT}/results/host"
 LOGS="${ROOT}/results/logs"
 BUILD="${ROOT}/build"
 # Unit-test executables (CMake target names).
-UNIT_TESTS=(test_hvac_core test_config)
+UNIT_TESTS=(test_hvac_core test_config test_sensor_iio test_modbus_regs)
 # Coverage thresholds (PROJECT_PLAN.md Phase 5): file:min_line_pct:min_branch_pct
 COVERAGE_TARGETS=("hvac_core.c:95:90" "config.c:90:0")
 
@@ -115,6 +115,14 @@ step "software-in-the-loop simulation"
 "${BUILD}/thermostat/sil" "${ROOT}/results/sil" > "${LOGS}/sil.log"
 "${PY}" "${ROOT}/scripts/check_sil.py" "${ROOT}/results/sil/sil_metrics.json" "${OUT}/sil_check.json"
 "${PY}" "${ROOT}/scripts/plot_sil.py" "${ROOT}/results/sil" "${ROOT}/docs/images/sil_hot_day.png"
+
+step "daemon integration tests (pytest, fake sysfs, Modbus, Valgrind)"
+pytest_rc=0
+HVACD_BIN="${BUILD}/thermostat/hvacd" "${PY}" -m pytest -p no:cacheprovider -q \
+	--junitxml="${ROOT}/results/tmp/pytest_host.xml" "${ROOT}/tests/host" || pytest_rc=$?
+"${PY}" "${ROOT}/scripts/junit_counts.py" "${ROOT}/results/tmp/pytest_host.xml" \
+	"${OUT}/pytest_host.json"
+[[ "${pytest_rc}" -eq 0 ]]
 
 "${PY}" "${ROOT}/scripts/host_summary.py" "${OUT}"
 echo "[test-host] all host checks passed"

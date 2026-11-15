@@ -16,8 +16,8 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 3 | Complete driver (IIO, conversion, alarms, KUnit) | done | `make test-all`: host lint clean, guest 83/83, 0 skipped | `phase 3: Complete driver` / `phase-3` |
 | 4 | Driver hardening (robustness, memory, static analysis, mutation) | done | `make test-all && make mutation`: lint + static clean, guest 90/90, 0 skipped, mutation 3/3 | `phase 4: Driver hardening` / `phase-4` |
 | 5 | Thermostat control core and simulation | done | `make test-all`: host 52 unit tests x3 (normal/ASan+UBSan/Valgrind) + SIL checks, guest 90/90, 0 skipped | `phase 5: Thermostat control core and simulation` / `phase-5` |
-| 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | in progress | | |
-| 7 | CI, metrics, documentation, publishing (v1.0.0) | not started | | |
+| 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | done | `make test-all`: host 76/76 (67 unit x3 + 9 integration), guest 98/98, 0 skipped | `phase 6: Thermostat daemon on the board` / `phase-6` |
+| 7 | CI, metrics, documentation, publishing (v1.0.0) | in progress | | |
 | Ext 1 | Watchdog supervision | not started | | |
 | Ext 2 | Fault detection and diagnostics | not started | | |
 | Ext 3 | MQTT telemetry | not started | | |
@@ -27,22 +27,17 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 6 (Thermostat daemon on the board)
+Phase: 7 (CI, metrics, documentation, publishing)
 
-Phase 5 task checklist (done):
+Phase 6 task checklist (done):
 
-- [x] `thermostat/` CMake project (C11, strict flags, `HVAC_SANITIZE`, `HVAC_COVERAGE`)
-- [x] Unity v2.7.0 vendored with license
-- [x] `hvac_core.c` (section 4.4), `config.c` (parse string + load file, 8 KB); D-021, D-022
-- [x] `test_hvac_core.c` (34), `test_config.c` (18)
-- [x] Room simulator, baseline controller, metrics, `sil` (integer micro-degrees); D-023
-- [x] `scripts/plot_sil.py` -> `docs/images/sil_hot_day.png`
-- [x] `scripts/test_host.sh`: lint, cppcheck, unit x3, coverage thresholds, SIL + checks
-- [x] Gate; learning note `docs/phases/phase-05-control-core.md`
-
-Work prepared ahead (not committed yet, belongs to later phases): Phase 2/3/4 driver code and tests
-staged; `thermostat/` core, config, simulator and unit tests (Phase 5); daemon modules, Modbus client and
-host daemon tests (Phase 6). Each is committed only with its own phase gate.
+- [x] `log.c`, `sensor_iio.c`, `modbus_regs.c` (D-024), `modbus_server.c`, `main.c`
+- [x] `test_sensor_iio.c` (9), `test_modbus_regs.c` (6)
+- [x] Buildroot package `hvacd`, `/etc/hvacd.conf` (from `thermostat/config/`), demo `S90hvac-demo`
+- [x] `tests/common/modbus_client.py` (+ CLI), `tests/common/hvacd_runner.py`
+- [x] `tests/host/test_daemon_host.py` (9, incl. Valgrind)
+- [x] `tests/guest/test_daemon_e2e.py` (8) + metrics; weak read-back test fixed (D-025)
+- [x] Gate; learning note `docs/phases/phase-06-daemon.md`
 
 ## Blockers
 
@@ -65,6 +60,8 @@ log file path, what you need from the user.)
 - Phase 5: host unit tests 52 (normal, ASan+UBSan, Valgrind all clean); cppcheck 0; coverage hvac_core.c
   100 % lines / 98.9 % branches, config.c 98.1 % lines; SIL hot day product 2.83 starts/h vs baseline
   592.2, 0 short cycles, comfort 100 % in all scenarios.
+- Phase 6: host 76 (67 unit + 9 integration), guest 98; fault detection 0.07 s; Modbus round trip 2.15 ms;
+  hvacd RSS 1412 kB, binary 26480 bytes; Valgrind 0 errors.
 
 ## Publishing
 

@@ -3,4 +3,5 @@
 menu "HVAC project packages"
 	source "$BR2_EXTERNAL_HVAC_PATH/package/hvac-temp/Config.in"
 	source "$BR2_EXTERNAL_HVAC_PATH/package/hvac-hello/Config.in"
+	source "$BR2_EXTERNAL_HVAC_PATH/package/hvacd/Config.in"
 endmenu

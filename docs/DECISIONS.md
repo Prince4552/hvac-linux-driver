@@ -284,3 +284,40 @@ Format (newest at the bottom):
   7. Percentages are kept as integer hundredths and printed with two decimals (no floating point in C).
 - Reason: simplest reading of the plan; every choice is deterministic so results are identical everywhere.
 - Consequences: the CSV is sampled every 10 s; the plot's shading therefore has 10 s resolution.
+
+## D-024: Daemon structure and behavior details
+- Date / phase: 2026-11-15, Phase 6
+- Context: sections 4.6 and 4.7 fix the daemon's behavior but not every detail.
+- Decision:
+  1. Extra file `src/modbus_regs.c` (+ header): the pure status <-> register mapping, separate from the
+     libmodbus network code, so it is unit-tested without sockets. CMake builds `hvacd_support`
+     (sensor, register map, log) without libmodbus; only `hvacd` links libmodbus.
+  2. A Modbus setpoint write is detected by comparing registers 2 and 3 with the values the daemon last
+     published. Both are then validated together with `hvac_core_set_setpoints()`.
+  3. Each readable client gets one request answered per loop pass. A started request must complete
+     within 200 ms (libmodbus indication/byte timeout), so a slow client cannot stall the control loop.
+     A client beyond `modbus_max_clients` is accepted and closed immediately.
+  4. Logging: state changes and output changes at INFO; the first sensor failure after a good read at WARN,
+     and the recovery at INFO (not once per tick, so a missing sensor does not flood the log).
+  5. If the loop falls behind (a tick is late), the next tick is scheduled one period after now: ticks
+     are skipped, never run in a burst.
+  6. The default `/etc/hvacd.conf` is installed by the `hvacd` Buildroot package from
+     `thermostat/config/hvacd.conf` (single source, no copy in the overlay).
+  7. Tests use port 15020 on the host and in the guest (the guest's port 502 belongs to the demo service).
+  8. In the guest test, the fault-latency assertion uses the metric target from section 9
+     (<= 3 x loop period + 1 s). The host test asserts the stricter 3 loop periods. The emulated guest adds
+     Modbus polling overhead, which is not part of the daemon's reaction time.
+- Reason: simplest designs that satisfy the plan and keep the control loop deterministic.
+- Consequences: none for the public interfaces.
+
+## D-025: Setpoint tests check the effect, not the read-back
+- Date / phase: 2026-11-15, Phase 6
+- Context: the first guest run failed `test_setpoint_writes_are_validated`. libmodbus stores a write in the
+  register table immediately, so reading the register back succeeds *before* hvacd has validated it. The
+  test wrote a valid and then an invalid setpoint within one loop period; hvacd (correctly) saw a single
+  invalid change and restored the defaults. The earlier host test had the same blind spot: it would have
+  passed even if hvacd ignored writes completely.
+- Decision: both tests now prove a valid write was applied through its effect (a cooling setpoint below the
+  room temperature must start cooling), then check that an invalid write restores the applied values.
+- Reason: a test must fail when the behavior is missing.
+- Consequences: none for the daemon (its behavior was correct and matches section 4.6).
