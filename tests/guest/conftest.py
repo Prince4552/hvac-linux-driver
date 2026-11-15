@@ -4,8 +4,8 @@
 - check_kernel_log (autouse): after every test, the kernel log written during the test must be
   free of BUG/WARNING/Oops/KASAN/... lines. Runs as teardown, so it also runs when a test fails.
 - stub: the simulated chip (i2c-stub at 0x48) is loaded for the test and unloaded afterwards.
-- hvac_device: stub + hvac_temp module + device at 0x48 with the driver bound; torn down in
-  reverse order (delete device, unload module, unload stub) even when the test fails.
+- hvac_device: stub + hvac_temp module + device at 0x48, driver bound and IIO device present;
+  torn down in reverse order (delete device, unload module, unload stub) even when the test fails.
 """
 import os
 from typing import Iterator
@@ -44,6 +44,7 @@ def hvac_device(stub: int) -> Iterator[int]:
         h.new_device(h.CHIP_ADDR)
         try:
             assert h.wait_until(lambda: h.bound_driver() == h.DRIVER_NAME, BIND_TIMEOUT_S)
+            assert h.wait_until(lambda: h.iio_dir() is not None, BIND_TIMEOUT_S)
             yield stub
         finally:
             if os.path.exists(h.client_dir()):

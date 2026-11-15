@@ -2,9 +2,14 @@
  "schema": 1,
  "metrics": {
   "guest_boot_to_tests_s": {
-   "value": 8.7,
+   "value": 9.0,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
+  },
+  "kunit_cases_passed": {
+   "value": 5,
+   "unit": "count",
+   "meaning": "Kernel-level checks of the conversion math (KUnit cases passed)"
   }
  }
 }

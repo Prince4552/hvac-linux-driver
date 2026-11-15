@@ -1,4 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
-# Kernel build rules for the hvac_temp driver (out-of-tree module).
+# Kernel build rules for the hvac_temp driver (out-of-tree modules).
+# hvac_temp.ko: the driver. hvac_temp_kunit.ko: its KUnit tests, built only when the kernel has
+# KUnit (CONFIG_KUNIT is "y" there, but an out-of-tree file can only be built as a module, "m").
 obj-m := hvac_temp.o
-hvac_temp-y := hvac_temp_main.o
+hvac_temp-y := hvac_temp_main.o hvac_temp_alarm.o
+
+ifneq ($(CONFIG_KUNIT),)
+obj-m += hvac_temp_kunit.o
+endif

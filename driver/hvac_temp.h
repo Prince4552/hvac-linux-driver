@@ -8,6 +8,7 @@
 
 #include <linux/i2c.h>
 #include <linux/mutex.h>
+#include <linux/sysfs.h>
 
 /**
  * struct hvac_temp_data - per-device state
@@ -18,5 +19,8 @@ struct hvac_temp_data {
 	struct i2c_client *client;
 	struct mutex lock;
 };
+
+/* Alarm-limit sysfs attributes, defined in hvac_temp_alarm.c. */
+extern const struct attribute_group hvac_temp_alarm_group;
 
 #endif /* HVAC_TEMP_H */

@@ -13,8 +13,8 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 0 | Foundation | done | `make check-env && make venv && make lint`: all pass | `phase 0: Foundation` / `phase-0` |
 | 1 | Platform (Buildroot + QEMU + autotest) | done | `make test-all`: host lint clean, guest 34/34, 0 skipped | `phase 1: Platform` / `phase-1` |
 | 2 | Driver skeleton and hello module | done | `make test-all`: host lint clean, guest 40/40, 0 skipped | `phase 2: Driver skeleton and hello module` / `phase-2` |
-| 3 | Complete driver (IIO, conversion, alarms, KUnit) | in progress | | |
-| 4 | Driver hardening (robustness, memory, static analysis, mutation) | not started | | |
+| 3 | Complete driver (IIO, conversion, alarms, KUnit) | done | `make test-all`: host lint clean, guest 83/83, 0 skipped | `phase 3: Complete driver` / `phase-3` |
+| 4 | Driver hardening (robustness, memory, static analysis, mutation) | in progress | | |
 | 5 | Thermostat control core and simulation | not started | | |
 | 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | not started | | |
 | 7 | CI, metrics, documentation, publishing (v1.0.0) | not started | | |
@@ -27,15 +27,17 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 3 (Complete driver)
+Phase: 4 (Driver hardening)
 
-Phase 2 task checklist (done):
+Phase 3 task checklist (done):
 
-- [x] `examples/hello_module/hello.c` + `Kbuild`, Buildroot package `hvac-hello`
-- [x] `driver/hvac_temp_regs.h`, `hvac_temp.h`, `hvac_temp_main.c` (probe: SMBus check, devm alloc, devm_mutex_init, CONFIG read, dev_info); package `hvac-temp`
-- [x] `driver/Makefile` for out-of-tree builds
-- [x] `tests/guest/test_driver_probe.py` (6 tests) and `hvac_device` fixture
-- [x] Gate `make test-all`; learning note `docs/phases/phase-02-driver-skeleton.md`; D-015
+- [x] `driver/hvac_temp_conv.h` exactly as plan 4.3
+- [x] IIO channel, `read_raw` (RAW under mutex, SCALE constant), `devm_iio_device_register`
+- [x] `driver/hvac_temp_alarm.c` (two attributes via IIO attrs group, under the mutex)
+- [x] `driver/hvac_temp_kunit.c` (suite `hvac_temp_conv`, 5 cases), separate module
+- [x] Tests: conversion (12), attributes (5), alarms (25), KUnit (1); D-016, D-017
+- [x] Read-error path limitation documented (D-018)
+- [x] Gate `make test-all`; learning note `docs/phases/phase-03-complete-driver.md`
 
 Work prepared ahead (not committed yet, belongs to later phases): Phase 2/3/4 driver code and tests
 staged; `thermostat/` core, config, simulator and unit tests (Phase 5); daemon modules, Modbus client and
@@ -56,6 +58,7 @@ log file path, what you need from the user.)
 - Phase 1: first full Buildroot build 13.8 min; kernel Image 38 MB; rootfs 54 MB used; boot to tests ~9 s;
   guest 34/34.
 - Phase 2: guest 40/40; 50 bind cycles in 13 s.
+- Phase 3: guest 83/83; KUnit 5/5 cases (`kunit_cases_passed` = 5).
 
 ## Publishing
 

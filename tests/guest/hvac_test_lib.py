@@ -91,13 +91,15 @@ def _require_bus() -> int:
 
 def set_chip_reg(reg: int, value16: int, addr: int = CHIP_ADDR) -> None:
     """Stores a chip register value (most significant byte first, as the chip sends it)."""
-    run(["i2cset", "-y", str(_require_bus()), f"0x{addr:02x}", f"0x{reg:02x}",
+    # -f (force): talk to the address even while hvac_temp has claimed it. Safe here because
+    # i2c-stub is only memory; on real hardware this could confuse a running driver.
+    run(["i2cset", "-f", "-y", str(_require_bus()), f"0x{addr:02x}", f"0x{reg:02x}",
          f"0x{swap16(value16):04x}", "w"])
 
 
 def get_chip_reg(reg: int, addr: int = CHIP_ADDR) -> int:
     """Returns a chip register value (most significant byte first, as the chip sends it)."""
-    out = run(["i2cget", "-y", str(_require_bus()), f"0x{addr:02x}", f"0x{reg:02x}", "w"])
+    out = run(["i2cget", "-f", "-y", str(_require_bus()), f"0x{addr:02x}", f"0x{reg:02x}", "w"])
     return swap16(int(out.strip(), 16))
 
 

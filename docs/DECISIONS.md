@@ -170,3 +170,38 @@ Format (newest at the bottom):
 - Reason: a real product would use its manufacturer's registered prefix (for example `ti,tmp102`).
 - Alternatives considered: `ti,tmp102` (would collide with the real in-kernel tmp102 driver).
 - Consequences: `checkpatch.pl` warns about the undocumented compatible (allowed in Phase 4, with reason).
+
+## D-016: `in_temp_raw` / `in_temp_scale` are read-only by behavior, not by file mode
+- Date / phase: 2026-11-15, Phase 3
+- Context: the plan lists these files with mode `r`. The first Phase 3 run showed the IIO core in Linux
+  6.18 creates every channel attribute as `0644` (it always installs its generic write handler).
+- Decision: the test checks behavior instead: reading works and any write fails with `EINVAL` (the driver
+  has no `write_raw()`). The two alarm files are checked for mode `0644` because the driver sets that.
+- Reason: the file mode of channel attributes is decided by the IIO core, not by the driver; what matters
+  to a user is that the value cannot be changed.
+- Alternatives considered: none that keep using the standard IIO channel mechanism.
+- Consequences: none for users.
+
+## D-017: Test helpers use `i2cset -f` / `i2cget -f`
+- Date / phase: 2026-11-15, Phase 3
+- Context: once `hvac_temp` is bound at 0x48, the i2c-dev interface refuses that address with
+  "Device or resource busy", so tests could no longer set the simulated chip's registers.
+- Decision: `set_chip_reg()` / `get_chip_reg()` pass `-f` (force), which uses `I2C_SLAVE_FORCE`.
+- Reason: on `i2c-stub` the "chip" is plain memory, so a forced access cannot disturb anything; the
+  driver's mutex is not involved because the test talks to the stub directly, like a real chip changing
+  its own temperature register.
+- Alternatives considered: unbinding the driver around every register change (would not test live reads).
+- Consequences: never copy this habit to real hardware without thinking.
+
+## D-018: The I2C read-error path after probe is covered indirectly
+- Date / phase: 2026-11-15, Phase 3
+- Context: `i2c-stub` always answers at the addresses it simulates; it cannot be told to fail a transfer
+  after the driver has probed. So `in_temp_raw` returning an I2C error cannot be triggered directly.
+- Decision: the read-error path is covered by (1) the missing-chip test (probe's identical
+  `i2c_smbus_read_word_swapped()` error path, Phase 2), (2) the remove-while-reading test (reads fail with
+  an error code while the device goes away, Phase 4), and (3) code review: `read_raw` returns the negative
+  error code unchanged, which IIO passes to `read()` as the error.
+- Reason: honesty about what the simulated chip can and cannot do (plan Phase 3, task 6).
+- Alternatives considered: a fault-injecting fake I2C adapter module (more kernel code to maintain and
+  review than the path it would test).
+- Consequences: listed under limitations in the technical report.
