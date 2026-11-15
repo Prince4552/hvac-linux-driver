@@ -1,0 +1,32 @@
+# Downloads, build trees and caches (never committed; see docs/ENGINEERING_RULES.md section 8)
+.cache/
+build*/
+results/logs/
+results/tmp/
+results/sil/*.csv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Kernel build outputs
+*.o
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+*.cmd
+.*.cmd
+*.a
+Module.symvers
+modules.order
+.tmp_versions/
+
+# Coverage output
+*.gcda
+*.gcno
+*.gcov
+coverage/
+
+# Windows download metadata created when files are copied from Windows into WSL
+*:Zone.Identifier
