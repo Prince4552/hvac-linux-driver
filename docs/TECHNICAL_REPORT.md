@@ -248,7 +248,7 @@ A watchdog timer resets the board unless the software regularly proves it is ali
 timer, so a hung loop really does stop the kicks. On a clean shutdown it writes the "magic close"
 character `V`, which tells the kernel the stop is intentional. The tests use the kernel's software
 watchdog in a mode that only logs instead of rebooting. A healthy daemon never triggers it. A daemon
-frozen with `SIGSTOP` triggers it after **1.94 s** (timeout 2 s). A clean shutdown leaves it quiet.
+frozen with `SIGSTOP` triggers it after **1.99 s** (timeout 2 s). A clean shutdown leaves it quiet.
 
 ### 8.2 Fault detection and diagnostics (Ext 2)
 
@@ -291,8 +291,8 @@ interfaces always agree.
 | Measurement (emulated board) | Result | Target |
 | --- | --- | --- |
 | Messages received / sent, 10 periods | 1.0 | 1.0 |
-| Control-loop period change, broker down 12 s | 4 ms | <= 100 ms |
-| Broker restart to `online` again | 4.78 s | <= 15 s |
+| Control-loop period change, broker down 12 s | 3 ms | <= 100 ms |
+| Broker restart to `online` again | 4.74 s | <= 15 s |
 | `kill -9` of `hvacd` | retained `offline` delivered | |
 
 The new formatter tests found a latent bug in existing code: `mb_mc_to_cc(INT32_MIN)` negated the
