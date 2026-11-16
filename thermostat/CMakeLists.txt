@@ -29,7 +29,7 @@ if(HVAC_COVERAGE)
 endif()
 
 # Pure control library: no I/O in hvac_core.c; config.c reads one file in config_load_file().
-add_library(hvac_core STATIC src/hvac_core.c src/config.c)
+add_library(hvac_core STATIC src/hvac_core.c src/hvac_fdd.c src/config.c)
 target_include_directories(hvac_core PUBLIC include)
 target_compile_options(hvac_core PRIVATE ${HVAC_WARNINGS})
 
@@ -53,7 +53,7 @@ if(HVAC_BUILD_TESTS)
 	add_library(unity STATIC third_party/unity/unity.c)
 	target_include_directories(unity PUBLIC third_party/unity)
 
-	foreach(t test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog)
+	foreach(t test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog test_hvac_fdd)
 		add_executable(${t} tests/${t}.c)
 		target_link_libraries(${t} PRIVATE hvacd_support unity)
 		target_compile_options(${t} PRIVATE ${HVAC_WARNINGS})
@@ -62,7 +62,7 @@ if(HVAC_BUILD_TESTS)
 
 	# Software-in-the-loop room simulator.
 	add_executable(sil sim/sil_main.c sim/room_model.c sim/baseline_controller.c
-		sim/sil_metrics.c)
+		sim/sil_metrics.c sim/sil_fdd.c)
 	target_include_directories(sil PRIVATE sim)
 	target_link_libraries(sil PRIVATE hvac_core)
 	target_compile_options(sil PRIVATE ${HVAC_WARNINGS})

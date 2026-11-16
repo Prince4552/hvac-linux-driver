@@ -71,6 +71,7 @@ typedef struct {
 	hvac_state_t state;
 	int32_t last_valid_mc;		/* last reading that passed the validity checks */
 	bool has_last_valid;
+	bool last_reading_valid;	/* did the most recent step's reading pass? (used by FDD) */
 	uint32_t good_count;		/* consecutive valid readings while in FAULT */
 	uint64_t compressor_on_since_ms;
 	uint64_t compressor_off_since_ms;

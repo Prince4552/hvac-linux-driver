@@ -333,7 +333,9 @@ static void test_implausible_jump_enters_fault(void)
 static void test_implausible_downward_jump_enters_fault(void)
 {
 	step(22000, 0);
+	TEST_ASSERT_TRUE(ctx.last_reading_valid);
 	TEST_ASSERT_EQUAL(HVAC_STATE_FAULT, step(22000 - 5001, 1000));
+	TEST_ASSERT_FALSE(ctx.last_reading_valid);
 }
 
 static void test_fault_recovers_after_exactly_recover_count_good_readings(void)

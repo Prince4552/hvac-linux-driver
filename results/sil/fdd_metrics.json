@@ -1,0 +1,23 @@
+{"schema": 1, "inject_at_h": 6, "detection": [
+  {"case": "capacity_loss@hot_day", "expected_bit": 1, "detected": true, "time_to_detect_min": 21.1, "bits": 1}
+ ,{"case": "compressor_fail@hot_day", "expected_bit": 1, "detected": true, "time_to_detect_min": 21.1, "bits": 1}
+ ,{"case": "sensor_stuck@hot_day", "expected_bit": 2, "detected": true, "time_to_detect_min": 29.9, "bits": 2}
+ ,{"case": "sensor_stuck@cold_day", "expected_bit": 2, "detected": true, "time_to_detect_min": 29.9, "bits": 2}
+ ,{"case": "sensor_stuck@mild_day", "expected_bit": 2, "detected": true, "time_to_detect_min": 29.9, "bits": 2}
+], "false_alarm_runs": [
+  {"scenario": "hot_day", "seed": 1, "bits": 0}
+ ,{"scenario": "hot_day", "seed": 2, "bits": 0}
+ ,{"scenario": "hot_day", "seed": 3, "bits": 0}
+ ,{"scenario": "hot_day", "seed": 4, "bits": 0}
+ ,{"scenario": "hot_day", "seed": 5, "bits": 0}
+ ,{"scenario": "cold_day", "seed": 1, "bits": 0}
+ ,{"scenario": "cold_day", "seed": 2, "bits": 0}
+ ,{"scenario": "cold_day", "seed": 3, "bits": 0}
+ ,{"scenario": "cold_day", "seed": 4, "bits": 0}
+ ,{"scenario": "cold_day", "seed": 5, "bits": 0}
+ ,{"scenario": "mild_day", "seed": 1, "bits": 0}
+ ,{"scenario": "mild_day", "seed": 2, "bits": 0}
+ ,{"scenario": "mild_day", "seed": 3, "bits": 0}
+ ,{"scenario": "mild_day", "seed": 4, "bits": 0}
+ ,{"scenario": "mild_day", "seed": 5, "bits": 0}
+], "fdd_detection_rate": 100.00, "fdd_false_alarms": 0, "fdd_mean_time_to_detect_min": 26.4}

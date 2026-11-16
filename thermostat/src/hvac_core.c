@@ -146,6 +146,7 @@ hvac_state_t hvac_core_step(hvac_ctx_t *ctx, const hvac_input_t *in, hvac_output
 		return HVAC_STATE_FAULT;
 
 	valid = reading_is_valid(ctx, in);
+	ctx->last_reading_valid = valid;
 	if (valid) {
 		ctx->last_valid_mc = in->temp_mc;
 		ctx->has_last_valid = true;

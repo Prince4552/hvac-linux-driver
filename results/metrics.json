@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_utc": "2026-11-15T21:05:46Z",
- "git_commit": "37715d2",
+ "generated_utc": "2026-11-16T03:46:33Z",
+ "git_commit": "819c938",
  "metrics": {
   "guest_tests_passed": {
    "value": 101,
@@ -20,7 +20,7 @@
    "source": "make test-qemu, summary.json"
   },
   "host_tests_passed": {
-   "value": 81,
+   "value": 93,
    "unit": "count",
    "target": "report",
    "pass": true,
@@ -84,7 +84,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_median_us": {
-   "value": 1091,
+   "value": 1141,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -92,7 +92,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_p99_us": {
-   "value": 4519,
+   "value": 4532,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -276,7 +276,7 @@
    "source": "phase 5, sil"
   },
   "modbus_roundtrip_median_ms": {
-   "value": 2.06,
+   "value": 1.95,
    "unit": "ms",
    "target": "report",
    "pass": true,
@@ -292,7 +292,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "hvacd_rss_kb": {
-   "value": 1504,
+   "value": 1472,
    "unit": "kB",
    "target": "report",
    "pass": true,
@@ -308,7 +308,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.6,
+   "value": 8.2,
    "unit": "s",
    "target": "report",
    "pass": true,
@@ -331,8 +331,32 @@
    "meaning": "Space used by the root filesystem image",
    "source": "build.sh"
   },
+  "fdd_detection_rate": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 100",
+   "pass": true,
+   "meaning": "Injected faults whose expected diagnostic bit was set (5 cases)",
+   "source": "ext 2, sil fdd"
+  },
+  "fdd_false_alarms": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Healthy simulated days (3 scenarios x 5 seeds) with any diagnostic bit set",
+   "source": "ext 2, sil fdd"
+  },
+  "fdd_mean_time_to_detect_min": {
+   "value": 26.4,
+   "unit": "min",
+   "target": "report",
+   "pass": true,
+   "meaning": "Average time from fault to diagnostic bit",
+   "source": "ext 2, sil fdd"
+  },
   "watchdog_trigger_latency_s": {
-   "value": 1.94,
+   "value": 1.96,
    "unit": "s",
    "target": "<= 5",
    "pass": true,

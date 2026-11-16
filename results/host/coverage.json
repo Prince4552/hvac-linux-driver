@@ -5,11 +5,15 @@
  "files": {
   "config.c": {
    "line_pct": 98.3,
-   "branch_pct": 93.4
+   "branch_pct": 93.6
   },
   "hvac_core.c": {
    "line_pct": 100.0,
    "branch_pct": 98.9
+  },
+  "hvac_fdd.c": {
+   "line_pct": 100.0,
+   "branch_pct": 93.5
   },
   "log.c": {
    "line_pct": 0.0,

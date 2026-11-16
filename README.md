@@ -86,6 +86,7 @@ wears it out.*
 | Extension | What it adds | Key result |
 | --- | --- | --- |
 | Ext 1: watchdog | `hvacd` kicks `/dev/watchdog` after each control step; magic close on shutdown | frozen daemon detected in 1.94 s (timeout 2 s) |
+| Ext 2: fault detection | Two rules (cooling ineffective, sensor stuck) published in Modbus register 8 | 5/5 injected faults detected (26.4 min average), 0 false alarms in 15 healthy simulated days |
 
 ## Repository map
 

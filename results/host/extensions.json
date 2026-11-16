@@ -1,0 +1,26 @@
+{
+ "schema": 1,
+ "metrics": {
+  "fdd_detection_rate": {
+   "value": 100.0,
+   "unit": "%",
+   "target": ">= 100",
+   "meaning": "Injected faults whose expected diagnostic bit was set (5 cases)",
+   "source": "ext 2, sil fdd"
+  },
+  "fdd_false_alarms": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "meaning": "Healthy simulated days (3 scenarios x 5 seeds) with any diagnostic bit set",
+   "source": "ext 2, sil fdd"
+  },
+  "fdd_mean_time_to_detect_min": {
+   "value": 26.4,
+   "unit": "min",
+   "target": "report",
+   "meaning": "Average time from fault to diagnostic bit",
+   "source": "ext 2, sil fdd"
+  }
+ }
+}

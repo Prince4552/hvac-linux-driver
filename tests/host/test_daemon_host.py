@@ -22,6 +22,8 @@ from hvacd_runner import (ALARM_SENSOR_FAULT, ALARM_SETPOINT_REJECTED, REG_ALARM
 from modbus_client import to_signed16  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
+REG_DIAGNOSTICS = 8
+FDD_SENSOR_STUCK = 0b10
 HVACD = Path(os.environ.get("HVACD_BIN", ROOT / "build" / "thermostat" / "hvacd"))
 PORT = 15020
 LOOP_MS = 200
@@ -146,6 +148,22 @@ def test_bad_watchdog_device_exits_one_with_message(tmp_path: Path, fake: FakeIi
                           timeout=10)
     assert proc.returncode == 1
     assert "cannot open watchdog /nonexistent/watchdog: No such file or directory" in proc.stderr
+
+
+def test_stuck_sensor_sets_diagnostic_register(tmp_path: Path, fake: FakeIio) -> None:
+    """Ext 2: an unchanged reading for fdd_stuck_window_s sets bit1 of register 8, logged once."""
+    conf = config_for(tmp_path, fake)
+    with open(conf, "a", encoding="utf-8") as f:
+        f.write("fdd_stuck_window_s = 60\n")  # the shortest allowed window
+    d = Daemon([str(HVACD), "--config", str(conf)], tmp_path / "hvacd.log", PORT)
+    try:
+        d.wait_ready(5.0)
+        assert d.regs()[REG_DIAGNOSTICS] == 0
+        assert wait_until(lambda: d.regs()[REG_DIAGNOSTICS] & FDD_SENSOR_STUCK != 0, 70.0, 0.5)
+        assert d.stop(2.0) == 0
+    finally:
+        d.kill()
+    assert d.log_path.read_text().count("diagnostic: sensor stuck") == 1
 
 
 def test_version_and_help() -> None:

@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include "hvac_core.h"
+#include "hvac_fdd.h"
 
 #define CONFIG_FILE_MAX_BYTES 8192u	/* largest accepted configuration file */
 #define CONFIG_PATH_MAX 256u		/* buffer size for path values, including the final NUL */
@@ -36,6 +37,8 @@ typedef struct {
 	uint32_t watchdog_enabled;		/* 0 or 1, default 0 */
 	char watchdog_device[CONFIG_PATH_MAX];	/* default /dev/watchdog */
 	uint32_t watchdog_timeout_s;		/* 2..60, default 10 */
+	/* Ext 2: fault detection and diagnostics */
+	hvac_fdd_config_t fdd;
 } hvacd_config_t;
 
 /** Fills cfg with every default from section 4.5. */

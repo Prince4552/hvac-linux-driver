@@ -25,6 +25,7 @@ typedef enum {
 	KEY_FAULT_RECOVER, KEY_MAX_STEP, KEY_LOOP_PERIOD, KEY_IIO_BASE_DIR, KEY_IIO_DEVICE_NAME,
 	KEY_MODBUS_PORT, KEY_MODBUS_MAX_CLIENTS, KEY_LOG_LEVEL,
 	KEY_WATCHDOG_ENABLED, KEY_WATCHDOG_DEVICE, KEY_WATCHDOG_TIMEOUT,
+	KEY_FDD_ENABLED, KEY_FDD_INEFFECTIVE_WINDOW, KEY_FDD_INEFFECTIVE_MIN_DROP, KEY_FDD_STUCK_WINDOW,
 	KEY_COUNT
 } key_id_t;
 
@@ -54,6 +55,12 @@ static const key_spec_t KEYS[KEY_COUNT] = {
 	[KEY_WATCHDOG_DEVICE] = { "watchdog_device", KIND_TEXT, 0, 0 },
 	[KEY_WATCHDOG_TIMEOUT] = { "watchdog_timeout_s", KIND_INT, WDT_TIMEOUT_MIN_S,
 				   WDT_TIMEOUT_MAX_S },
+	[KEY_FDD_ENABLED] = { "fdd_enabled", KIND_INT, 0, 1 },
+	[KEY_FDD_INEFFECTIVE_WINDOW] = { "fdd_ineffective_window_s", KIND_INT, FDD_WINDOW_MIN_S,
+					 FDD_WINDOW_MAX_S },
+	[KEY_FDD_INEFFECTIVE_MIN_DROP] = { "fdd_ineffective_min_drop_mc", KIND_INT,
+					   FDD_MIN_DROP_MIN_MC, FDD_MIN_DROP_MAX_MC },
+	[KEY_FDD_STUCK_WINDOW] = { "fdd_stuck_window_s", KIND_INT, FDD_WINDOW_MIN_S, FDD_WINDOW_MAX_S },
 };
 
 static const char *const LOG_LEVEL_NAMES[] = { "error", "warn", "info", "debug" };
@@ -101,6 +108,7 @@ void config_set_defaults(hvacd_config_t *cfg)
 	cfg->watchdog_enabled = 0u;
 	(void)snprintf(cfg->watchdog_device, sizeof(cfg->watchdog_device), "%s", "/dev/watchdog");
 	cfg->watchdog_timeout_s = 10u;
+	hvac_fdd_config_set_defaults(&cfg->fdd);
 }
 
 const char *config_log_level_name(config_log_level_t level)
@@ -147,6 +155,10 @@ static void store_int(hvacd_config_t *cfg, key_id_t id, int64_t v)
 	case KEY_MODBUS_MAX_CLIENTS: cfg->modbus_max_clients = (uint32_t)v; break;
 	case KEY_WATCHDOG_ENABLED: cfg->watchdog_enabled = (uint32_t)v; break;
 	case KEY_WATCHDOG_TIMEOUT: cfg->watchdog_timeout_s = (uint32_t)v; break;
+	case KEY_FDD_ENABLED: cfg->fdd.enabled = v != 0; break;
+	case KEY_FDD_INEFFECTIVE_WINDOW: cfg->fdd.ineffective_window_s = (uint32_t)v; break;
+	case KEY_FDD_INEFFECTIVE_MIN_DROP: cfg->fdd.ineffective_min_drop_mc = (int32_t)v; break;
+	case KEY_FDD_STUCK_WINDOW: cfg->fdd.stuck_window_s = (uint32_t)v; break;
 	default: break;	/* not an integer key */
 	}
 }

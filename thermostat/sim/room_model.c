@@ -23,6 +23,7 @@
 #define SENSOR_NOISE_UC 100000LL	/* uniform noise within +-0.1 C */
 #define SENSOR_STEP_UC 62500LL		/* one chip step: 0.0625 C */
 #define PERCENT 100LL
+#define CAPACITY_LOSS_STRENGTH_PCT 40u
 
 static const room_scenario_t SCENARIOS[] = {
 	{ "hot_day", 35 * UC_PER_C, 30 * UC_PER_C, true },
@@ -113,12 +114,47 @@ static int64_t floor_div(int64_t a, int64_t b)
 
 int32_t room_sensor_read_mc(room_t *room)
 {
-	uint32_t r = xorshift32(&room->rng_state);
+	uint32_t r = xorshift32(&room->rng_state);	/* drawn even when stuck: same sequence */
 	int64_t noise_uc = (int64_t)(r % (uint32_t)(2 * SENSOR_NOISE_UC + 1)) - SENSOR_NOISE_UC;
 	int64_t raw = floor_div(room->temp_uc + noise_uc, SENSOR_STEP_UC);
 	int64_t x = raw * 125;	/* raw -> millidegrees: x / 2, rounded half away from zero */
 
-	return (int32_t)(x >= 0 ? (x + 1) / 2 : (x - 1) / 2);
+	if (room->sensor_stuck && room->has_last_reading)
+		return room->last_reading_mc;
+	room->last_reading_mc = (int32_t)(x >= 0 ? (x + 1) / 2 : (x - 1) / 2);
+	room->has_last_reading = true;
+	return room->last_reading_mc;
+}
+
+void room_inject_fault(room_t *room, room_fault_t fault)
+{
+	switch (fault) {
+	case ROOM_FAULT_CAPACITY_LOSS:
+		room->cooling_strength_pct = CAPACITY_LOSS_STRENGTH_PCT;
+		break;
+	case ROOM_FAULT_COMPRESSOR_FAIL:
+		room->cooling_strength_pct = 0u;
+		break;
+	case ROOM_FAULT_SENSOR_STUCK:
+		room->sensor_stuck = true;
+		break;
+	default:
+		break;
+	}
+}
+
+const char *room_fault_name(room_fault_t fault)
+{
+	switch (fault) {
+	case ROOM_FAULT_CAPACITY_LOSS:
+		return "capacity_loss";
+	case ROOM_FAULT_COMPRESSOR_FAIL:
+		return "compressor_fail";
+	case ROOM_FAULT_SENSOR_STUCK:
+		return "sensor_stuck";
+	default:
+		return "none";
+	}
 }
 
 int32_t room_true_mc(const room_t *room)

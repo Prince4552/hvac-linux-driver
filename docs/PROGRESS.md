@@ -17,9 +17,9 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 4 | Driver hardening (robustness, memory, static analysis, mutation) | done | `make test-all && make mutation`: lint + static clean, guest 90/90, 0 skipped, mutation 3/3 | `phase 4: Driver hardening` / `phase-4` |
 | 5 | Thermostat control core and simulation | done | `make test-all`: host 52 unit tests x3 (normal/ASan+UBSan/Valgrind) + SIL checks, guest 90/90, 0 skipped | `phase 5: Thermostat control core and simulation` / `phase-5` |
 | 6 | Thermostat daemon on the board (sensor, Modbus, end to end) | done | `make test-all`: host 76/76 (67 unit x3 + 9 integration), guest 98/98, 0 skipped | `phase 6: Thermostat daemon on the board` / `phase-6` |
-| 7 | CI, metrics, documentation, publishing (v1.0.0) | in progress | `make test-all && make mutation && make metrics`: host 76/76, guest 98/98, 0 skipped, mutation 3/3, 41/41 metrics on target; CI: pending | `phase 7: CI, metrics, documentation, publishing` / `phase-7` |
-| Ext 1 | Watchdog supervision | done (push pending Phase 7 CI) | `make test-all`: host 81/81, guest 101/101, 0 skipped | `ext 1: Watchdog supervision` / `ext-1` |
-| Ext 2 | Fault detection and diagnostics | not started | | |
+| 7 | CI, metrics, documentation, publishing (v1.0.0) | done | `make test-all && make mutation && make metrics`: host 76/76, guest 98/98, 0 skipped, mutation 3/3, 41/41 metrics on target; CI run 43760149090: host + qemu success | `phase 7: CI, metrics, documentation, publishing` / `phase-7` |
+| Ext 1 | Watchdog supervision | done | `make test-all`: host 81/81, guest 101/101, 0 skipped | `ext 1: Watchdog supervision` / `ext-1` |
+| Ext 2 | Fault detection and diagnostics | done | `make test-all`: host 93/93 (82 unit x3 + 11 integration), guest 101/101, 0 skipped; 45/45 metrics | `ext 2: Fault detection and diagnostics` / `ext-2` |
 | Ext 3 | MQTT telemetry | not started | | |
 | Ext 4 | Control core on FreeRTOS (v1.1.0) | not started | | |
 
@@ -27,17 +27,20 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: 7 (CI, metrics, documentation, publishing): committed locally; next: publish and verify
+Phase: Ext 2 (Fault detection and diagnostics)
 
-Phase 7 task checklist:
+Ext 2 task checklist:
 
-- [x] `.github/workflows/ci.yml` (jobs `host`, `qemu`; cache; artifacts; free disk)
-- [x] `scripts/collect_metrics.py` + `make metrics` (41 metrics); D-026
-- [x] `README.md`, `docs/TECHNICAL_REPORT.md` (3,700 words), `THIRD_PARTY.md`, `VERSIONS.md`
-- [x] Full gate incl. mutation from a clean build; metrics all on target
-- [x] Commit `phase 7: ...`, tag `phase-7`
-- [ ] Publish (`gh repo create`), push, `scripts/verify_push.sh`, wait for CI
-- [ ] Release `v1.0.0`
+- [x] `hvac_fdd.c` + header (cooling ineffective bit0, sensor stuck bit1, latching); config keys; D-028
+- [x] `hvacd` publishes the bits in Modbus register 8 and logs each bit once
+- [x] Simulator fault injection + detection and false-alarm matrices (`sil fdd`, `scripts/check_fdd.py`)
+- [x] Unit tests at and around every threshold, reset behavior; host daemon test for register 8
+- [x] Metrics `fdd_detection_rate`, `fdd_false_alarms`, `fdd_mean_time_to_detect_min`
+- [x] Learning note, README, TECHNICAL_REPORT section 8.2
+- [x] Gate `make test-all`, `make metrics`
+- [ ] Commit `ext 2: ...`, tag `ext-2`, push, verify, CI
+
+(Phase 7 finished this session: publish verified, CI green, release `v1.0.0` created at `phase-7`.)
 
 ## Blockers
 
@@ -64,10 +67,13 @@ log file path, what you need from the user.)
   hvacd RSS 1412 kB, binary 26480 bytes; Valgrind 0 errors.
 - Phase 7: clean full build 5.9 min (warm caches); 41/41 metrics on target; mutation 3/3 (11/29/4).
 - Ext 1: watchdog trigger latency 1.94 s (timeout 2 s); host 81, guest 101.
+- Ext 2: FDD detection 5/5 (100 %), mean time to detect 26.4 min, false alarms 0/15; hvac_fdd.c 100 %
+  lines / 93.5 % branches; host 93, guest 101; 45/45 metrics on target.
 
 ## Publishing
 
-- Repository URL: (Phase 7)
-- Last pushed commit:
-- Tags on remote:
-- Last CI run and result:
+- Repository URL: https://github.com/Prince4552/hvac-linux-driver
+- Release: `v1.0.0` (at `phase-7`), https://github.com/Prince4552/hvac-linux-driver/releases/tag/v1.0.0
+- Last pushed commit: `819c938` (ext 1), verified with `scripts/verify_push.sh`
+- Tags on remote: phase-0 .. phase-7, ext-1, v1.0.0
+- Last CI run and result: `phase 7` commit, run 43760149090, host + qemu success; `ext 1` run: pending

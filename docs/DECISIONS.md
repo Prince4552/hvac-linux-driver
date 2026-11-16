@@ -364,3 +364,27 @@ Format (newest at the bottom):
   (Addendum after the first run: the guest test's cleanup disarms the watchdog with its own magic close
   before unloading `softdog`, because a daemon ended with SIGKILL leaves the watchdog running and the
   kernel then refuses to unload the module. That is the intended safety behavior, not a bug.)
+
+## D-028: Fault detection details (Ext 2)
+- Date / phase: 2026-11-15, Ext 2
+- Context: the plan defines the two rules, their defaults and the experiment matrices, but not every
+  detail.
+- Decision:
+  1. `hvac_ctx_t` gains `last_reading_valid` (set by every `hvac_core_step()`), so FDD uses exactly the
+     core's notion of a valid reading. The field is additive; no existing interface changed.
+  2. Config ranges: `fdd_enabled` 0..1 (default 1), `fdd_ineffective_window_s` and `fdd_stuck_window_s`
+     60..86400 s, `fdd_ineffective_min_drop_mc` 100..10000.
+  3. Cooling-ineffective window: it starts at the first valid reading with the compressor on, and is
+     re-referenced at the end of each window. Invalid readings are skipped (neither start nor judge a
+     window). "Drop" is reference minus current; a rise counts as a negative drop.
+  4. Sensor-stuck: any change of the valid reading (even one 1/16 °C step) restarts the timer.
+  5. Simulator faults (from 06:00): `capacity_loss` = cooling at 40 % strength, `compressor_fail` =
+     cooling at 0 %, `sensor_stuck` = the simulated sensor repeats its last reading. The noise generator
+     still advances while stuck, so a run's random sequence does not depend on the fault.
+  6. Detection-matrix runs use seed 1. Time to detect is measured from the injection to the first step
+     where the expected bit is set. False-alarm runs count a day as a false alarm if *any* bit is set by
+     the end of the day.
+  7. The detection target (100 %) and false-alarm target (0) are checked in `make test-host`
+     (`scripts/check_fdd.py`).
+- Reason: simplest reading of the plan; all deterministic.
+- Consequences: the rules only see faults in equipment that is being used (see the technical report).

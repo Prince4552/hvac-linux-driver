@@ -13,9 +13,9 @@ OUT="${ROOT}/results/host"
 LOGS="${ROOT}/results/logs"
 BUILD="${ROOT}/build"
 # Unit-test executables (CMake target names).
-UNIT_TESTS=(test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog)
+UNIT_TESTS=(test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog test_hvac_fdd)
 # Coverage thresholds (PROJECT_PLAN.md Phase 5): file:min_line_pct:min_branch_pct
-COVERAGE_TARGETS=("hvac_core.c:95:90" "config.c:90:0")
+COVERAGE_TARGETS=("hvac_core.c:95:90" "hvac_fdd.c:95:90" "config.c:90:0")
 
 mkdir -p "${OUT}" "${LOGS}" "${BUILD}" "${ROOT}/results/sil" "${ROOT}/results/tmp"
 "${ROOT}/scripts/setup_host_venv.sh"
@@ -115,6 +115,10 @@ step "software-in-the-loop simulation"
 "${BUILD}/thermostat/sil" "${ROOT}/results/sil" > "${LOGS}/sil.log"
 "${PY}" "${ROOT}/scripts/check_sil.py" "${ROOT}/results/sil/sil_metrics.json" "${OUT}/sil_check.json"
 "${PY}" "${ROOT}/scripts/plot_sil.py" "${ROOT}/results/sil" "${ROOT}/docs/images/sil_hot_day.png"
+
+step "fault detection experiments (Ext 2)"
+"${BUILD}/thermostat/sil" fdd "${ROOT}/results/sil" > "${LOGS}/sil-fdd.log"
+"${PY}" "${ROOT}/scripts/check_fdd.py" "${ROOT}/results/sil/fdd_metrics.json" "${OUT}/extensions.json"
 
 step "daemon integration tests (pytest, fake sysfs, Modbus, Valgrind)"
 pytest_rc=0

@@ -4,7 +4,8 @@
  * serves Modbus clients between control ticks. Each tick: apply Modbus setpoint writes, read the
  * sensor, run hvac_core_step(), apply (log) the outputs, refresh the Modbus register table.
  * With watchdog_enabled, the watchdog is kicked after every completed tick (Ext 1), so a hung loop
- * lets it expire. Exit codes: 0 clean shutdown (SIGINT/SIGTERM), 1 configuration or start-up error,
+ * lets it expire. Fault detection (Ext 2) runs after each step and is published in register 8.
+ * Exit codes: 0 clean shutdown (SIGINT/SIGTERM), 1 configuration or start-up error,
  * 2 fatal error.
  */
 #include <errno.h>
@@ -16,6 +17,7 @@
 
 #include "config.h"
 #include "hvac_core.h"
+#include "hvac_fdd.h"
 #include "log.h"
 #include "modbus_regs.h"
 #include "modbus_server.h"
@@ -41,6 +43,7 @@ typedef struct {
 	mb_server_t mb;
 	mb_status_t status;
 	wdt_t wdt;
+	hvac_fdd_t fdd;
 	bool sensor_ok;		/* result of the previous read, to log changes only */
 	uint64_t start_ms;
 } app_t;
@@ -103,6 +106,7 @@ static int app_start(const char *config_path)
 	}
 	log_set_level(app.cfg.log_level);
 	if (hvac_core_init(&app.core, &app.cfg.core) != 0 ||
+	    hvac_fdd_init(&app.fdd, &app.cfg.fdd) != 0 ||
 	    sensor_iio_init(&app.sensor, app.cfg.iio_base_dir, app.cfg.iio_device_name) != 0) {
 		log_msg(LOG_ERROR, "invalid configuration");
 		return -EINVAL;
@@ -194,6 +198,23 @@ static void log_changes(hvac_state_t old_state, const hvac_outputs_t *old_out,
 			out->fan ? "on" : "off");
 }
 
+/* Ext 2: feeds fault detection and logs each diagnostic bit the first time it is set. */
+static void run_fdd(const hvac_input_t *in)
+{
+	hvac_fdd_input_t fin = { .compressor = app.status.outputs.compressor,
+				 .valid = app.core.last_reading_valid, .temp_mc = in->temp_mc,
+				 .now_ms = in->now_ms };
+	uint16_t old_bits = app.status.diagnostics;
+	uint16_t new_bits = hvac_fdd_step(&app.fdd, &fin);
+
+	if ((new_bits & FDD_COOLING_INEFFECTIVE) && !(old_bits & FDD_COOLING_INEFFECTIVE))
+		log_msg(LOG_WARN, "diagnostic: cooling ineffective (compressor on, room not cooling)");
+	if ((new_bits & FDD_SENSOR_STUCK) && !(old_bits & FDD_SENSOR_STUCK))
+		log_msg(LOG_WARN, "diagnostic: sensor stuck (reading unchanged for %u s)",
+			app.cfg.fdd.stuck_window_s);
+	app.status.diagnostics = new_bits;
+}
+
 static void control_tick(uint64_t now_ms)
 {
 	hvac_state_t old_state = app.status.state;
@@ -204,6 +225,7 @@ static void control_tick(uint64_t now_ms)
 	in = read_sensor(now_ms);
 	app.status.state = hvac_core_step(&app.core, &in, &app.status.outputs);
 	log_changes(old_state, &old_out, &in, &app.status.outputs);
+	run_fdd(&in);
 
 	app.status.has_temp = app.core.has_last_valid;
 	app.status.temp_mc = app.core.last_valid_mc;

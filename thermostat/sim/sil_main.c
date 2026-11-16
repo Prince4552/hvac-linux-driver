@@ -4,6 +4,7 @@
  * the room model for 24 simulated hours per scenario, one-second steps, and writes a CSV every
  * 10 s plus control-quality metrics. Usage: sil OUT_DIR [SEED]
  * Writes OUT_DIR/<scenario>_<controller>.csv and OUT_DIR/sil_metrics.json.
+ * "sil fdd OUT_DIR" runs the fault-detection experiments instead (Ext 2, sil_fdd.c).
  */
 #include <errno.h>
 #include <stdio.h>
@@ -13,6 +14,7 @@
 #include "baseline_controller.h"
 #include "hvac_core.h"
 #include "room_model.h"
+#include "sil_fdd.h"
 #include "sil_metrics.h"
 
 #define CSV_EVERY_S 10u
@@ -170,6 +172,12 @@ int main(int argc, char **argv)
 	uint32_t seed = DEFAULT_SEED;
 	int ret = 0;
 
+	if (argc == 3 && strcmp(argv[1], "fdd") == 0) {
+		ret = sil_fdd_run_all(argv[2]);
+		if (ret != 0)
+			fprintf(stderr, "sil fdd: failed: %s\n", strerror(-ret));
+		return ret == 0 ? 0 : 1;
+	}
 	if (argc < 2 || argc > 3 || (argc == 3 && parse_seed(argv[2], &seed) != 0)) {
 		fprintf(stderr, "usage: %s OUT_DIR [SEED>0]\n", argv[0]);
 		return 2;

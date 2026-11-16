@@ -243,6 +243,30 @@ character `V`, which tells the kernel the stop is intentional. The tests use the
 watchdog in a mode that only logs instead of rebooting. A healthy daemon never triggers it. A daemon
 frozen with `SIGSTOP` triggers it after **1.94 s** (timeout 2 s). A clean shutdown leaves it quiet.
 
+### 8.2 Fault detection and diagnostics (Ext 2)
+
+FDD (fault detection and diagnostics) means spotting equipment problems from operating data before a
+person notices them. `hvac_fdd.c` adds two rules. Like the control core, it is pure: no memory
+allocation, no input/output, no clock.
+
+| Bit | Rule | Default | Typical cause |
+| --- | --- | --- | --- |
+| 0 `COOLING_INEFFECTIVE` | Compressor on for a whole window, room cooled by less than the minimum | 1200 s window, 0.5 °C | Low refrigerant, dead compressor |
+| 1 `SENSOR_STUCK` | Valid reading unchanged, even by 1/16 °C | 1800 s | Frozen sensor or wiring |
+
+The bits latch until `hvacd` restarts. They appear in Modbus register 8, and each is logged once.
+The simulator injects each fault at 06:00 into a 24-hour day run with the real core:
+
+| Experiment | Result |
+| --- | --- |
+| Detection matrix (5 cases) | 5/5 detected; capacity loss and compressor failure after 21.1 min, stuck sensor after 29.9 min (mean 26.4 min) |
+| False-alarm matrix (3 healthy days x 5 seeds) | 0 false alarms |
+
+A fault can only be detected when the affected part is used. A broken compressor on a cold day, with
+no cooling demand, stays hidden: the compressor never runs, so the rule has nothing to judge. That is
+why the cooling faults appear only in the hot-day matrix. The thresholds fit this simulated room; a
+real building would need field data to tune them (see D-028).
+
 ## 9. How to reproduce
 
 | Command | What it does | Time |

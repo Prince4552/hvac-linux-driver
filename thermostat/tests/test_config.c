@@ -58,6 +58,10 @@ static void test_empty_text_gives_all_defaults(void)
 	TEST_ASSERT_EQUAL_UINT32(0, cfg.watchdog_enabled);
 	TEST_ASSERT_EQUAL_STRING("/dev/watchdog", cfg.watchdog_device);
 	TEST_ASSERT_EQUAL_UINT32(10, cfg.watchdog_timeout_s);
+	TEST_ASSERT_TRUE(cfg.fdd.enabled);
+	TEST_ASSERT_EQUAL_UINT32(1200, cfg.fdd.ineffective_window_s);
+	TEST_ASSERT_EQUAL_INT32(500, cfg.fdd.ineffective_min_drop_mc);
+	TEST_ASSERT_EQUAL_UINT32(1800, cfg.fdd.stuck_window_s);
 }
 
 static void test_full_valid_file_sets_every_key(void)
@@ -78,7 +82,11 @@ static void test_full_valid_file_sets_every_key(void)
 		"log_level = debug\n"
 		"watchdog_enabled = 1\n"
 		"watchdog_device = /dev/watchdog1\n"
-		"watchdog_timeout_s = 2\n";
+		"watchdog_timeout_s = 2\n"
+		"fdd_enabled = 0\n"
+		"fdd_ineffective_window_s = 600\n"
+		"fdd_ineffective_min_drop_mc = 300\n"
+		"fdd_stuck_window_s = 900\n";
 
 	TEST_ASSERT_EQUAL_INT(0, parse(text));
 	TEST_ASSERT_EQUAL_INT32(25000, cfg.core.cool_setpoint_mc);
@@ -97,6 +105,10 @@ static void test_full_valid_file_sets_every_key(void)
 	TEST_ASSERT_EQUAL_UINT32(1, cfg.watchdog_enabled);
 	TEST_ASSERT_EQUAL_STRING("/dev/watchdog1", cfg.watchdog_device);
 	TEST_ASSERT_EQUAL_UINT32(2, cfg.watchdog_timeout_s);
+	TEST_ASSERT_FALSE(cfg.fdd.enabled);
+	TEST_ASSERT_EQUAL_UINT32(600, cfg.fdd.ineffective_window_s);
+	TEST_ASSERT_EQUAL_INT32(300, cfg.fdd.ineffective_min_drop_mc);
+	TEST_ASSERT_EQUAL_UINT32(900, cfg.fdd.stuck_window_s);
 }
 
 static void test_comments_blank_lines_and_whitespace_are_ignored(void)
@@ -160,6 +172,10 @@ static void test_out_of_range_values_are_errors(void)
 		     "config:1: value 2 for 'watchdog_enabled' is out of range 0..1");
 	expect_error("watchdog_timeout_s = 61\n",
 		     "config:1: value 61 for 'watchdog_timeout_s' is out of range 2..60");
+	expect_error("fdd_stuck_window_s = 59\n",
+		     "config:1: value 59 for 'fdd_stuck_window_s' is out of range 60..86400");
+	expect_error("fdd_ineffective_min_drop_mc = 10001\n",
+		     "config:1: value 10001 for 'fdd_ineffective_min_drop_mc' is out of range 100..10000");
 }
 
 static void test_range_limits_themselves_are_accepted(void)
