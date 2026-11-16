@@ -1,5 +1,5 @@
 {"schema": 1, "buildroot_version": "2026.02.3", "kernel_version": "6.18.7",
  "toolchain": "Bootlin aarch64 glibc stable 2025.08-1", "gcc_version": "14.3.0",
- "build_duration_min": 0.5, "full_build_duration_min": 5.9,
+ "build_duration_min": 1.0, "full_build_duration_min": 5.9,
  "kernel_image_bytes": 39944704,
  "rootfs_size_mb": 55}

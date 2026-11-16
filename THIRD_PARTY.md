@@ -17,8 +17,9 @@ into `.cache/` or installed on the host. Exact versions and checksums are in `VE
 | i2c-tools | `i2cset`, `i2cget`, `i2cdetect` in the guest | 4.4 | GPL-2.0-or-later | no (`.cache/`) |
 | Python 3 / pytest (guest) | Guest test runner | 3.14 / 9.0.2 | PSF-2.0 / MIT | no (`.cache/`) |
 | libmodbus | Modbus TCP server in `hvacd` (guest 3.1.11 via Buildroot; host package for host tests) | 3.1.11 | LGPL-2.1-or-later (dynamically linked) | no |
+| Eclipse Mosquitto | MQTT broker, `mosquitto_sub`, and libmosquitto in `hvacd` (Ext 3; guest via Buildroot, host package for host tests) | 2.0.22 | EPL-2.0 or EDL-1.0 (dynamically linked) | no |
 | Unity | C unit-test framework | v2.7.0 | MIT | **yes**, `thermostat/third_party/unity/` (unchanged copy + license) |
 | cppcheck, Valgrind, GCC sanitizers, gcov | Host checks | host packages | GPL (tools only, nothing linked into our code) | no (host) |
 | QEMU | Emulates the ARM64 board | host package `qemu-system-arm` (10.2.1 on the development host) | GPL-2.0 | no (host) |
 
-Extensions add rows (mosquitto, FreeRTOS-Kernel) when they bring them in.
+Extensions add rows when they bring in new components (FreeRTOS-Kernel in Ext 4).

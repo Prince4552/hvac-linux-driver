@@ -13,9 +13,9 @@ OUT="${ROOT}/results/host"
 LOGS="${ROOT}/results/logs"
 BUILD="${ROOT}/build"
 # Unit-test executables (CMake target names).
-UNIT_TESTS=(test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog test_hvac_fdd)
+UNIT_TESTS=(test_hvac_core test_config test_sensor_iio test_modbus_regs test_watchdog test_hvac_fdd test_telemetry_json)
 # Coverage thresholds (PROJECT_PLAN.md Phase 5): file:min_line_pct:min_branch_pct
-COVERAGE_TARGETS=("hvac_core.c:95:90" "hvac_fdd.c:95:90" "config.c:90:0")
+COVERAGE_TARGETS=("hvac_core.c:95:90" "hvac_fdd.c:95:90" "telemetry_json.c:95:90" "config.c:90:0")
 
 mkdir -p "${OUT}" "${LOGS}" "${BUILD}" "${ROOT}/results/sil" "${ROOT}/results/tmp"
 "${ROOT}/scripts/setup_host_venv.sh"

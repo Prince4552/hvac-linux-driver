@@ -6,18 +6,24 @@
    "unit": "count",
    "meaning": "Wrong or failed readings with 8 threads reading at once (8 x 1000 reads)"
   },
+  "control_loop_jitter_broker_down_ms": {
+   "value": 4,
+   "unit": "ms",
+   "meaning": "Largest change of the 200 ms control-loop period while the broker is down",
+   "target": "<= 100"
+  },
   "driver_load_unload_cycles": {
    "value": 500,
    "unit": "count",
    "meaning": "Times the driver was loaded, used and removed without a problem"
   },
   "driver_read_latency_median_us": {
-   "value": 1141,
+   "value": 1125,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (median); relative numbers only"
   },
   "driver_read_latency_p99_us": {
-   "value": 4532,
+   "value": 3985,
    "unit": "us",
    "meaning": "Time for one temperature read on the emulated board, including Python overhead (99th percentile); relative numbers only"
   },
@@ -27,12 +33,12 @@
    "meaning": "Time from sensor loss (device deleted) to the alarm being visible over Modbus"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.2,
+   "value": 8.6,
    "unit": "s",
    "meaning": "Seconds from kernel start to the start of the guest tests (emulated board)"
   },
   "hvacd_binary_bytes": {
-   "value": 30576,
+   "value": 34672,
    "unit": "bytes",
    "meaning": "Size of the stripped hvacd program on the board"
   },
@@ -62,12 +68,24 @@
    "meaning": "Locking mistakes that could deadlock, in the whole run"
   },
   "modbus_roundtrip_median_ms": {
-   "value": 1.95,
+   "value": 1.99,
    "unit": "ms",
    "meaning": "Time for a Modbus request and reply on the emulated board (relative only)"
   },
+  "mqtt_messages_received_ratio": {
+   "value": 1.0,
+   "unit": "ratio",
+   "meaning": "Telemetry messages received / sent over 10 healthy periods",
+   "target": "== 1.0"
+  },
+  "mqtt_reconnect_s": {
+   "value": 4.78,
+   "unit": "s",
+   "meaning": "Time from broker restart until hvacd is connected again",
+   "target": "<= 15"
+  },
   "watchdog_trigger_latency_s": {
-   "value": 1.96,
+   "value": 1.97,
    "unit": "s",
    "meaning": "Time from the daemon freezing to the watchdog expiring (timeout 2 s)",
    "target": "<= 5"

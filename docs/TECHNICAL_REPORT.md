@@ -267,6 +267,33 @@ no cooling demand, stays hidden: the compressor never runs, so the rule has noth
 why the cooling faults appear only in the hot-day matrix. The thresholds fit this simulated room; a
 real building would need field data to tune them (see D-028).
 
+### 8.3 MQTT telemetry (Ext 3)
+
+MQTT (Message Queuing Telemetry Transport) is the usual protocol for sending equipment data to the
+cloud. `hvacd` publishes one JSON message every `mqtt_period_s` to `hvac/<device>/telemetry` with
+QoS 1 (quality of service "at least once"). It keeps a retained `online`/`offline` on
+`hvac/<device>/status`; a last will makes the broker publish `offline` if the daemon dies.
+
+The rule that shaped the design: network problems must never disturb control. The daemon stays
+single-threaded. The connection is opened without waiting (`mosquitto_connect_async()`), and each
+loop iteration runs one network step with a zero timeout. A lost broker is retried every 5 s, and
+messages are skipped, not queued, while disconnected. The JSON is built from the same status as the
+Modbus registers by a pure formatter with a fixed 512-byte buffer (`telemetry_json.c`), so the two
+interfaces always agree.
+
+| Measurement (emulated board) | Result | Target |
+| --- | --- | --- |
+| Messages received / sent, 10 periods | 1.0 | 1.0 |
+| Control-loop period change, broker down 12 s | 4 ms | <= 100 ms |
+| Broker restart to `online` again | 4.78 s | <= 15 s |
+| `kill -9` of `hvacd` | retained `offline` delivered | |
+
+The new formatter tests found a latent bug in existing code: `mb_mc_to_cc(INT32_MIN)` negated the
+minimum integer, which is undefined behavior in C. Real readings never get near it, but the
+sanitizer build failed at once. It now computes in 64 bits, with a regression test (D-029).
+Limitations: a host *name* needs a blocking DNS lookup (the board uses an IP address); messages are
+not stored while offline; the demo broker has no TLS or passwords.
+
 ## 9. How to reproduce
 
 | Command | What it does | Time |

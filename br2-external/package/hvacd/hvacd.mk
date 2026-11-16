@@ -8,7 +8,7 @@ HVACD_VERSION = 1.0
 HVACD_SITE = $(BR2_EXTERNAL_HVAC_PATH)/../thermostat
 HVACD_SITE_METHOD = local
 HVACD_LICENSE = MIT
-HVACD_DEPENDENCIES = host-pkgconf libmodbus
+HVACD_DEPENDENCIES = host-pkgconf libmodbus mosquitto
 # Unit tests and the simulator run on the host (make test-host), not on the board.
 HVACD_CONF_OPTS = -DHVAC_BUILD_TESTS=OFF
 

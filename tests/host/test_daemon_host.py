@@ -3,7 +3,8 @@
 
 No QEMU needed: a temporary folder imitates /sys/bus/iio/devices/iio:deviceN, and the tests talk
 to hvacd over Modbus TCP on port 15020 with short timers. A second test runs the same scenario
-under Valgrind and requires zero memory errors and zero definite or indirect leaks.
+under Valgrind and requires zero memory errors and zero definite or indirect leaks; that run has
+MQTT telemetry (Ext 3) enabled against a private broker, so libmosquitto use is checked too.
 """
 import os
 import shutil
@@ -20,6 +21,7 @@ from hvacd_runner import (ALARM_SENSOR_FAULT, ALARM_SETPOINT_REJECTED, REG_ALARM
                           REG_COOL, REG_HEAT, REG_OUT, REG_STATE, REG_TEMP, STATE_COOLING,
                           STATE_FAULT, STATE_IDLE, Daemon, wait_until, write_short_timer_config)
 from modbus_client import to_signed16  # noqa: E402
+from mqtt_helpers import Broker, Subscriber, mqtt_config_lines  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 REG_DIAGNOSTICS = 8
@@ -179,12 +181,18 @@ def test_daemon_is_clean_under_valgrind(tmp_path: Path, fake: FakeIio) -> None:
     valgrind = shutil.which("valgrind")
     assert valgrind is not None, "valgrind is required (apt package valgrind)"
     vg_log = tmp_path / "valgrind.log"
+    conf = config_for(tmp_path, fake)
+    with open(conf, "a", encoding="utf-8") as f:
+        f.write(mqtt_config_lines(1))
+    broker = Broker(tmp_path)
+    broker.start()
+    sub = Subscriber(tmp_path, "hvac/hvac-01/telemetry", "telemetry")
     cmd = [valgrind, "--leak-check=full", "--errors-for-leak-kinds=definite,indirect",
-           "--error-exitcode=99", f"--log-file={vg_log}",
-           str(HVACD), "--config", str(config_for(tmp_path, fake))]
+           "--error-exitcode=99", f"--log-file={vg_log}", str(HVACD), "--config", str(conf)]
     d = Daemon(cmd, tmp_path / "hvacd.log", PORT)
     try:
         d.wait_ready(30.0)
+        assert wait_until(lambda: len(sub.messages()) >= 2, 20.0, 0.2)  # telemetry path ran
         with d.client() as client:
             client.write_register(REG_COOL, 4100)  # rejected write path
             client.write_register(REG_COOL, 2500)  # accepted write path
@@ -197,6 +205,8 @@ def test_daemon_is_clean_under_valgrind(tmp_path: Path, fake: FakeIio) -> None:
         code = d.stop(30.0)
     finally:
         d.kill()
+        sub.close()
+        broker.stop()
     report = vg_log.read_text()
     assert code == 0, report
     assert "ERROR SUMMARY: 0 errors" in report, report

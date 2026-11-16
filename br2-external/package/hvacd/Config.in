@@ -1,7 +1,9 @@
 config BR2_PACKAGE_HVACD
 	bool "hvacd"
 	select BR2_PACKAGE_LIBMODBUS
+	select BR2_PACKAGE_MOSQUITTO
 	help
 	  hvacd: thermostat daemon (this project's thermostat/ folder).
 	  Reads the hvac_temp IIO sensor, runs the control core and
-	  serves a Modbus TCP register map.
+	  serves a Modbus TCP register map; optional MQTT telemetry
+	  (libmosquitto).

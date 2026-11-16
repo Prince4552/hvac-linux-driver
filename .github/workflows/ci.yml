@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake pkg-config libmodbus-dev valgrind \
-            cppcheck shellcheck
+            cppcheck shellcheck libmosquitto-dev mosquitto mosquitto-clients
       - name: make test-host
         run: make test-host
       - name: Upload host results

@@ -26,6 +26,7 @@ typedef enum {
 	KEY_MODBUS_PORT, KEY_MODBUS_MAX_CLIENTS, KEY_LOG_LEVEL,
 	KEY_WATCHDOG_ENABLED, KEY_WATCHDOG_DEVICE, KEY_WATCHDOG_TIMEOUT,
 	KEY_FDD_ENABLED, KEY_FDD_INEFFECTIVE_WINDOW, KEY_FDD_INEFFECTIVE_MIN_DROP, KEY_FDD_STUCK_WINDOW,
+	KEY_MQTT_ENABLED, KEY_MQTT_HOST, KEY_MQTT_PORT, KEY_MQTT_DEVICE_ID, KEY_MQTT_PERIOD,
 	KEY_COUNT
 } key_id_t;
 
@@ -61,6 +62,11 @@ static const key_spec_t KEYS[KEY_COUNT] = {
 	[KEY_FDD_INEFFECTIVE_MIN_DROP] = { "fdd_ineffective_min_drop_mc", KIND_INT,
 					   FDD_MIN_DROP_MIN_MC, FDD_MIN_DROP_MAX_MC },
 	[KEY_FDD_STUCK_WINDOW] = { "fdd_stuck_window_s", KIND_INT, FDD_WINDOW_MIN_S, FDD_WINDOW_MAX_S },
+	[KEY_MQTT_ENABLED] = { "mqtt_enabled", KIND_INT, 0, 1 },
+	[KEY_MQTT_HOST] = { "mqtt_host", KIND_TEXT, 0, 0 },
+	[KEY_MQTT_PORT] = { "mqtt_port", KIND_INT, 1, 65535 },
+	[KEY_MQTT_DEVICE_ID] = { "mqtt_device_id", KIND_TEXT, 0, 0 },
+	[KEY_MQTT_PERIOD] = { "mqtt_period_s", KIND_INT, 1, 3600 },
 };
 
 static const char *const LOG_LEVEL_NAMES[] = { "error", "warn", "info", "debug" };
@@ -109,6 +115,11 @@ void config_set_defaults(hvacd_config_t *cfg)
 	(void)snprintf(cfg->watchdog_device, sizeof(cfg->watchdog_device), "%s", "/dev/watchdog");
 	cfg->watchdog_timeout_s = 10u;
 	hvac_fdd_config_set_defaults(&cfg->fdd);
+	cfg->mqtt_enabled = 0u;
+	(void)snprintf(cfg->mqtt_host, sizeof(cfg->mqtt_host), "%s", "127.0.0.1");
+	cfg->mqtt_port = 1883u;
+	(void)snprintf(cfg->mqtt_device_id, sizeof(cfg->mqtt_device_id), "%s", "hvac-01");
+	cfg->mqtt_period_s = 5u;
 }
 
 const char *config_log_level_name(config_log_level_t level)
@@ -159,6 +170,9 @@ static void store_int(hvacd_config_t *cfg, key_id_t id, int64_t v)
 	case KEY_FDD_INEFFECTIVE_WINDOW: cfg->fdd.ineffective_window_s = (uint32_t)v; break;
 	case KEY_FDD_INEFFECTIVE_MIN_DROP: cfg->fdd.ineffective_min_drop_mc = (int32_t)v; break;
 	case KEY_FDD_STUCK_WINDOW: cfg->fdd.stuck_window_s = (uint32_t)v; break;
+	case KEY_MQTT_ENABLED: cfg->mqtt_enabled = (uint32_t)v; break;
+	case KEY_MQTT_PORT: cfg->mqtt_port = (uint16_t)v; break;
+	case KEY_MQTT_PERIOD: cfg->mqtt_period_s = (uint32_t)v; break;
 	default: break;	/* not an integer key */
 	}
 }
@@ -180,6 +194,16 @@ static int apply_int(parse_state_t *ps, hvacd_config_t *cfg, key_id_t id, const 
 	return 0;
 }
 
+/* mqtt_device_id becomes part of MQTT topics and JSON text: letters, digits and '-' only. */
+static bool is_device_id(const char *value)
+{
+	for (const char *c = value; *c != '\0'; c++) {
+		if (!isalnum((unsigned char)*c) && *c != '-')
+			return false;
+	}
+	return true;
+}
+
 static int apply_text(parse_state_t *ps, hvacd_config_t *cfg, key_id_t id, const char *value)
 {
 	char *dest = cfg->iio_device_name;
@@ -192,6 +216,14 @@ static int apply_text(parse_state_t *ps, hvacd_config_t *cfg, key_id_t id, const
 	} else if (id == KEY_WATCHDOG_DEVICE) {
 		dest = cfg->watchdog_device;
 		size = sizeof(cfg->watchdog_device);
+	} else if (id == KEY_MQTT_HOST) {
+		dest = cfg->mqtt_host;
+		size = sizeof(cfg->mqtt_host);
+	} else if (id == KEY_MQTT_DEVICE_ID) {
+		if (!is_device_id(value))
+			return fail(ps, "mqtt_device_id may contain only letters, digits and '-'");
+		dest = cfg->mqtt_device_id;
+		size = sizeof(cfg->mqtt_device_id);
 	}
 	n = snprintf(dest, size, "%s", value);
 

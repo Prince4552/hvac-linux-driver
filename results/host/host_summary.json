@@ -1,8 +1,8 @@
 {
  "schema": 1,
- "host_tests_passed": 93,
+ "host_tests_passed": 107,
  "host_tests_failed": 0,
- "unit_tests_passed": 82,
- "pytest_host_passed": 11,
+ "unit_tests_passed": 91,
+ "pytest_host_passed": 16,
  "sil_checks_failed": 0
 }

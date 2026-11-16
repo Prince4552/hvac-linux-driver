@@ -87,6 +87,7 @@ wears it out.*
 | --- | --- | --- |
 | Ext 1: watchdog | `hvacd` kicks `/dev/watchdog` after each control step; magic close on shutdown | frozen daemon detected in 1.94 s (timeout 2 s) |
 | Ext 2: fault detection | Two rules (cooling ineffective, sensor stuck) published in Modbus register 8 | 5/5 injected faults detected (26.4 min average), 0 false alarms in 15 healthy simulated days |
+| Ext 3: MQTT telemetry | JSON telemetry every `mqtt_period_s`, retained online/offline status with last will, never blocks control | loop period changed by 4 ms with the broker down; reconnect in 4.78 s; 100 % of messages received |
 
 ## Repository map
 

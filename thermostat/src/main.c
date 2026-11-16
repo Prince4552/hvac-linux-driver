@@ -5,6 +5,8 @@
  * sensor, run hvac_core_step(), apply (log) the outputs, refresh the Modbus register table.
  * With watchdog_enabled, the watchdog is kicked after every completed tick (Ext 1), so a hung loop
  * lets it expire. Fault detection (Ext 2) runs after each step and is published in register 8.
+ * With mqtt_enabled, telemetry (Ext 3) is published every mqtt_period_s; its network step never
+ * blocks, so a missing broker cannot delay control.
  * Exit codes: 0 clean shutdown (SIGINT/SIGTERM), 1 configuration or start-up error,
  * 2 fatal error.
  */
@@ -22,6 +24,7 @@
 #include "modbus_regs.h"
 #include "modbus_server.h"
 #include "sensor_iio.h"
+#include "telemetry_mqtt.h"
 #include "watchdog.h"
 
 #define HVACD_VERSION "1.0.0"
@@ -44,6 +47,7 @@ typedef struct {
 	mb_status_t status;
 	wdt_t wdt;
 	hvac_fdd_t fdd;
+	telemetry_mqtt_t mqtt;
 	bool sensor_ok;		/* result of the previous read, to log changes only */
 	uint64_t start_ms;
 } app_t;
@@ -129,6 +133,18 @@ static int app_start(const char *config_path)
 			app.cfg.watchdog_timeout_s);
 	}
 	app.start_ms = mono_ms();
+	if (app.cfg.mqtt_enabled != 0u) {
+		ret = telemetry_mqtt_open(&app.mqtt, app.cfg.mqtt_host, app.cfg.mqtt_port,
+					  app.cfg.mqtt_device_id, app.cfg.mqtt_period_s, app.start_ms);
+		if (ret != 0) {
+			log_msg(LOG_ERROR, "cannot start MQTT telemetry: %s", strerror(-ret));
+			(void)wdt_close_clean(&app.wdt);
+			mb_server_close(&app.mb);
+			return ret;
+		}
+		log_msg(LOG_INFO, "MQTT telemetry to %s:%u as %s every %u s", app.cfg.mqtt_host,
+			app.cfg.mqtt_port, app.cfg.mqtt_device_id, app.cfg.mqtt_period_s);
+	}
 	app.sensor_ok = true;
 	app.status.state = HVAC_STATE_IDLE;
 	app.status.cool_setpoint_mc = app.cfg.core.cool_setpoint_mc;
@@ -215,6 +231,22 @@ static void run_fdd(const hvac_input_t *in)
 	app.status.diagnostics = new_bits;
 }
 
+/* Ext 3: the telemetry sample is a snapshot of the same status the Modbus registers show. */
+static void publish_telemetry(uint64_t now_ms)
+{
+	const mb_status_t *st = &app.status;
+	telemetry_t sample = {
+		.uptime_s = st->uptime_ms / MS_PER_S, .has_temp = st->has_temp, .temp_mc = st->temp_mc,
+		.state = st->state, .compressor = st->outputs.compressor, .heater = st->outputs.heater,
+		.fan = st->outputs.fan, .fdd = st->diagnostics,
+		.compressor_starts = st->compressor_starts,
+	};
+	const uint16_t *regs = mb_server_regs(&app.mb);
+
+	sample.alarms = regs[MB_REG_ALARMS];
+	telemetry_mqtt_publish_due(&app.mqtt, &sample, now_ms);
+}
+
 static void control_tick(uint64_t now_ms)
 {
 	hvac_state_t old_state = app.status.state;
@@ -232,6 +264,9 @@ static void control_tick(uint64_t now_ms)
 	app.status.compressor_starts = hvac_core_compressor_starts(&app.core);
 	app.status.uptime_ms = now_ms - app.start_ms;
 	mb_regs_publish(mb_server_regs(&app.mb), &app.status);
+	publish_telemetry(now_ms);
+	/* One line per tick at debug level: lets tests measure the real loop period (D-029). */
+	log_msg(LOG_DEBUG, "tick %llu", (unsigned long long)app.status.uptime_ms);
 }
 
 /* Waits up to wait_ms for Modbus traffic and serves it. Returns 0 or a negative errno value. */
@@ -247,6 +282,7 @@ static int serve_until(uint64_t wait_ms)
 
 	FD_ZERO(&readable);
 	mb_server_add_fds(&app.mb, &readable, &max_fd);
+	telemetry_mqtt_add_fds(&app.mqtt, &readable, &max_fd);
 	n = select(max_fd + 1, &readable, NULL, NULL, &tv);
 	if (n < 0)
 		return errno == EINTR ? 0 : -errno;
@@ -264,6 +300,7 @@ static int run_loop(void)
 	while (!stop_requested) {
 		uint64_t now = mono_ms();
 
+		telemetry_mqtt_service(&app.mqtt, now);	/* returns at once; no-op when disabled */
 		if (now >= next_tick) {
 			control_tick(now);
 			/* Kick only after a completed control step: a hung loop stops the kicks. */
@@ -311,6 +348,7 @@ int main(int argc, char **argv)
 	code = run_loop();
 	if (wdt_close_clean(&app.wdt) != 0)
 		log_msg(LOG_WARN, "watchdog magic close failed; the system may reset");
+	telemetry_mqtt_close(&app.mqtt);
 	mb_server_close(&app.mb);
 	return code;
 }

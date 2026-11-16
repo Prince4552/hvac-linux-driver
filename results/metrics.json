@@ -1,10 +1,10 @@
 {
  "schema": 1,
- "generated_utc": "2026-11-16T03:46:33Z",
- "git_commit": "819c938",
+ "generated_utc": "2026-11-16T04:06:05Z",
+ "git_commit": "e946bc4",
  "metrics": {
   "guest_tests_passed": {
-   "value": 101,
+   "value": 106,
    "unit": "count",
    "target": "report",
    "pass": true,
@@ -20,7 +20,7 @@
    "source": "make test-qemu, summary.json"
   },
   "host_tests_passed": {
-   "value": 93,
+   "value": 107,
    "unit": "count",
    "target": "report",
    "pass": true,
@@ -84,7 +84,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_median_us": {
-   "value": 1141,
+   "value": 1125,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -92,7 +92,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_p99_us": {
-   "value": 4532,
+   "value": 3985,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -276,7 +276,7 @@
    "source": "phase 5, sil"
   },
   "modbus_roundtrip_median_ms": {
-   "value": 1.95,
+   "value": 1.99,
    "unit": "ms",
    "target": "report",
    "pass": true,
@@ -300,7 +300,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "hvacd_binary_bytes": {
-   "value": 30576,
+   "value": 34672,
    "unit": "bytes",
    "target": "report",
    "pass": true,
@@ -308,7 +308,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.2,
+   "value": 8.6,
    "unit": "s",
    "target": "report",
    "pass": true,
@@ -330,6 +330,14 @@
    "pass": true,
    "meaning": "Space used by the root filesystem image",
    "source": "build.sh"
+  },
+  "control_loop_jitter_broker_down_ms": {
+   "value": 4,
+   "unit": "ms",
+   "target": "<= 100",
+   "pass": true,
+   "meaning": "Largest change of the 200 ms control-loop period while the broker is down",
+   "source": "extension"
   },
   "fdd_detection_rate": {
    "value": 100.0,
@@ -355,8 +363,24 @@
    "meaning": "Average time from fault to diagnostic bit",
    "source": "ext 2, sil fdd"
   },
+  "mqtt_messages_received_ratio": {
+   "value": 1.0,
+   "unit": "ratio",
+   "target": "== 1.0",
+   "pass": true,
+   "meaning": "Telemetry messages received / sent over 10 healthy periods",
+   "source": "extension"
+  },
+  "mqtt_reconnect_s": {
+   "value": 4.78,
+   "unit": "s",
+   "target": "<= 15",
+   "pass": true,
+   "meaning": "Time from broker restart until hvacd is connected again",
+   "source": "extension"
+  },
   "watchdog_trigger_latency_s": {
-   "value": 1.96,
+   "value": 1.97,
    "unit": "s",
    "target": "<= 5",
    "pass": true,

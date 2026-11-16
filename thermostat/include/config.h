@@ -16,6 +16,7 @@
 #define CONFIG_FILE_MAX_BYTES 8192u	/* largest accepted configuration file */
 #define CONFIG_PATH_MAX 256u		/* buffer size for path values, including the final NUL */
 #define CONFIG_NAME_MAX 64u		/* buffer size for name values, including the final NUL */
+#define CONFIG_DEVICE_ID_MAX 33u	/* mqtt_device_id: at most 32 characters + NUL */
 
 typedef enum {
 	CONFIG_LOG_ERROR = 0,
@@ -39,6 +40,12 @@ typedef struct {
 	uint32_t watchdog_timeout_s;		/* 2..60, default 10 */
 	/* Ext 2: fault detection and diagnostics */
 	hvac_fdd_config_t fdd;
+	/* Ext 3: MQTT telemetry */
+	uint32_t mqtt_enabled;			/* 0 or 1, default 0 */
+	char mqtt_host[CONFIG_NAME_MAX];	/* default 127.0.0.1 (use an IP address, D-029) */
+	uint16_t mqtt_port;			/* 1..65535, default 1883 */
+	char mqtt_device_id[CONFIG_DEVICE_ID_MAX];	/* letters, digits, '-'; default hvac-01 */
+	uint32_t mqtt_period_s;			/* 1..3600, default 5 */
 } hvacd_config_t;
 
 /** Fills cfg with every default from section 4.5. */

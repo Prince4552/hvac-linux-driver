@@ -20,27 +20,27 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | 7 | CI, metrics, documentation, publishing (v1.0.0) | done | `make test-all && make mutation && make metrics`: host 76/76, guest 98/98, 0 skipped, mutation 3/3, 41/41 metrics on target; CI run 43760149090: host + qemu success | `phase 7: CI, metrics, documentation, publishing` / `phase-7` |
 | Ext 1 | Watchdog supervision | done | `make test-all`: host 81/81, guest 101/101, 0 skipped | `ext 1: Watchdog supervision` / `ext-1` |
 | Ext 2 | Fault detection and diagnostics | done | `make test-all`: host 93/93 (82 unit x3 + 11 integration), guest 101/101, 0 skipped; 45/45 metrics | `ext 2: Fault detection and diagnostics` / `ext-2` |
-| Ext 3 | MQTT telemetry | not started | | |
+| Ext 3 | MQTT telemetry | done | `make test-all`: host 107/107 (91 unit x3 + 16 integration), guest 106/106, 0 skipped; 48/48 metrics | `ext 3: MQTT telemetry` / `ext-3` |
 | Ext 4 | Control core on FreeRTOS (v1.1.0) | not started | | |
 
 "Gate result" example: `make test-all: host 42/42, guest 57/57, 0 skipped`.
 
 ## Current phase
 
-Phase: Ext 2 (Fault detection and diagnostics)
+Phase: Ext 3 (MQTT telemetry)
 
-Ext 2 task checklist:
+Ext 3 task checklist:
 
-- [x] `hvac_fdd.c` + header (cooling ineffective bit0, sensor stuck bit1, latching); config keys; D-028
-- [x] `hvacd` publishes the bits in Modbus register 8 and logs each bit once
-- [x] Simulator fault injection + detection and false-alarm matrices (`sil fdd`, `scripts/check_fdd.py`)
-- [x] Unit tests at and around every threshold, reset behavior; host daemon test for register 8
-- [x] Metrics `fdd_detection_rate`, `fdd_false_alarms`, `fdd_mean_time_to_detect_min`
-- [x] Learning note, README, TECHNICAL_REPORT section 8.2
-- [x] Gate `make test-all`, `make metrics`
-- [ ] Commit `ext 2: ...`, tag `ext-2`, push, verify, CI
-
-(Phase 7 finished this session: publish verified, CI green, release `v1.0.0` created at `phase-7`.)
+- [x] D-029 (file split, payload, connection mechanics, loop-period measurement, metrics)
+- [x] `telemetry_json.c` (pure formatter) + `telemetry_mqtt.c` (non-blocking libmosquitto client)
+- [x] Topics, QoS 1, retained online, last-will offline; config keys with validation
+- [x] Buildroot: mosquitto (broker, clients, library); board config sends to the local broker
+- [x] Unit tests (formatter, config); host tests (broker on 18830, Valgrind with MQTT); guest tests
+- [x] Bug found and fixed: `mb_mc_to_cc()` overflow at int32 limits (regression test added)
+- [x] Gate `make test-all`, `make metrics` (`mqtt_messages_received_ratio`, `mqtt_reconnect_s`,
+      `control_loop_jitter_broker_down_ms`)
+- [x] Learning note results, README, TECHNICAL_REPORT section 8.3
+- [ ] Commit `ext 3: ...`, tag `ext-3`, push, verify, CI
 
 ## Blockers
 
@@ -69,11 +69,13 @@ log file path, what you need from the user.)
 - Ext 1: watchdog trigger latency 1.94 s (timeout 2 s); host 81, guest 101.
 - Ext 2: FDD detection 5/5 (100 %), mean time to detect 26.4 min, false alarms 0/15; hvac_fdd.c 100 %
   lines / 93.5 % branches; host 93, guest 101; 45/45 metrics on target.
+- Ext 3: MQTT received ratio 1.0; control-loop jitter with broker down 4 ms; reconnect 4.78 s;
+  telemetry_json.c 96.2 % lines / 94.4 % branches; host 107, guest 106; 48/48 metrics on target.
 
 ## Publishing
 
 - Repository URL: https://github.com/Prince4552/hvac-linux-driver
 - Release: `v1.0.0` (at `phase-7`), https://github.com/Prince4552/hvac-linux-driver/releases/tag/v1.0.0
-- Last pushed commit: `819c938` (ext 1), verified with `scripts/verify_push.sh`
-- Tags on remote: phase-0 .. phase-7, ext-1, v1.0.0
-- Last CI run and result: `phase 7` commit, run 43760149090, host + qemu success; `ext 1` run: pending
+- Last pushed commit: `e946bc4` (ext 2), verified with `scripts/verify_push.sh`
+- Tags on remote: phase-0 .. phase-7, ext-1, ext-2, v1.0.0
+- Last CI run and result: `phase 7` commit, run 43760149090, host + qemu success; `ext 1` runs 43799393231 (main) and 43799401402 (tag): success; `ext 2` run 43800200090: pending

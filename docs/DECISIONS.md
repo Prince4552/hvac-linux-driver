@@ -388,3 +388,43 @@ Format (newest at the bottom):
      (`scripts/check_fdd.py`).
 - Reason: simplest reading of the plan; all deterministic.
 - Consequences: the rules only see faults in equipment that is being used (see the technical report).
+
+## D-029: MQTT telemetry details (Ext 3)
+- Date / phase: 2026-11-16, Ext 3
+- Context: the plan fixes the library, topics, payload fields, config keys and tests, but not the
+  file split, the exact JSON, the connection mechanics or how to measure the loop period.
+- Decision:
+  1. Files: the pure formatter `telemetry_format_json()` lives in `src/telemetry_json.c`
+     (`include/telemetry_json.h`, no libmosquitto), the network client in `src/telemetry_mqtt.c`
+     (`include/telemetry_mqtt.h`). One responsibility per file, and the formatter's unit tests (and a
+     later FreeRTOS port) need no MQTT library. Additive; no existing interface changes.
+  2. Payload (one line, keys in the plan's order), for example
+     `{"device":"hvac-01","seq":7,"uptime_s":35,"temp_c":27.06,"state":"COOLING","compressor":true,`
+     `"heater":false,"fan":true,"alarms":0,"fdd":0,"compressor_starts":1}`.
+     `temp_c` is rounded exactly like Modbus register 0 (`mb_mc_to_cc()`), and is `null` before the first
+     valid reading. `state` is `hvac_state_name()`. `alarms` and `fdd` are the bit values of registers 5
+     and 8. The formatter returns the length, `-ENOSPC` on truncation (nothing is published) or `-EINVAL`.
+  3. Connection: MQTT 3.1.1, client id = `mqtt_device_id`, clean session, keep-alive 30 s.
+     `mosquitto_connect_async()` / `mosquitto_reconnect_async()` (non-blocking TCP connect) and
+     `mosquitto_loop(mosq, 0, 1)` once per loop iteration; the MQTT socket is also added to the
+     `select()` read set so incoming acknowledgements are handled promptly. Reconnect attempts are at
+     least 5 s apart. Limitation: a host *name* is resolved with a blocking DNS lookup, so the board
+     configuration uses an IP address.
+  4. Publishing: telemetry (QoS 1, not retained) only while connected. `seq` increases every period
+     whether or not the message could be sent, so a subscriber sees a gap for every missed message.
+     Status topic: retained `online` (QoS 1) after each connect; last will `offline` (retained, QoS 1);
+     on a clean shutdown hvacd publishes retained `offline` itself and waits at most 1 s for it to be sent.
+  5. Memory: hvacd's own code still allocates nothing in the loop. libmosquitto allocates internally
+     per packet and frees it when sent or acknowledged; because hvacd publishes only while connected,
+     at most a few messages are ever queued. The Valgrind daemon test runs with MQTT enabled.
+  6. Loop-period measurement: at `log_level = debug`, hvacd logs one `tick <ms>` line per control tick
+     (milliseconds since start, monotonic clock). The guest test computes each tick interval while the
+     broker is down; `control_loop_jitter_broker_down_ms` = largest |interval - loop_period_ms|.
+  7. Tests (host and guest) start their own broker on 127.0.0.1:18830 with a generated configuration,
+     no persistence. The board's default broker (Buildroot `S50mosquitto`, port 1883, localhost only)
+     serves the demo; the board configuration enables MQTT to 127.0.0.1:1883 (compiled-in default 0).
+  8. Metrics: `mqtt_messages_received_ratio` = messages received / (last seq - first seq + 1) over a
+     healthy 10-period window (target 1.0); `mqtt_reconnect_s` = broker restart to `online` seen again
+     (target <= 15); `control_loop_jitter_broker_down_ms` (target <= 100).
+- Reason: simplest reading of the plan that keeps control independent of the network.
+- Consequences: `hvacd` links libmosquitto; the Buildroot image gains mosquitto (broker, library, clients).

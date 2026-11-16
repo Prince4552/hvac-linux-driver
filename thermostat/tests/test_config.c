@@ -62,6 +62,11 @@ static void test_empty_text_gives_all_defaults(void)
 	TEST_ASSERT_EQUAL_UINT32(1200, cfg.fdd.ineffective_window_s);
 	TEST_ASSERT_EQUAL_INT32(500, cfg.fdd.ineffective_min_drop_mc);
 	TEST_ASSERT_EQUAL_UINT32(1800, cfg.fdd.stuck_window_s);
+	TEST_ASSERT_EQUAL_UINT32(0, cfg.mqtt_enabled);
+	TEST_ASSERT_EQUAL_STRING("127.0.0.1", cfg.mqtt_host);
+	TEST_ASSERT_EQUAL_UINT16(1883, cfg.mqtt_port);
+	TEST_ASSERT_EQUAL_STRING("hvac-01", cfg.mqtt_device_id);
+	TEST_ASSERT_EQUAL_UINT32(5, cfg.mqtt_period_s);
 }
 
 static void test_full_valid_file_sets_every_key(void)
@@ -86,7 +91,12 @@ static void test_full_valid_file_sets_every_key(void)
 		"fdd_enabled = 0\n"
 		"fdd_ineffective_window_s = 600\n"
 		"fdd_ineffective_min_drop_mc = 300\n"
-		"fdd_stuck_window_s = 900\n";
+		"fdd_stuck_window_s = 900\n"
+		"mqtt_enabled = 1\n"
+		"mqtt_host = 10.0.2.2\n"
+		"mqtt_port = 18830\n"
+		"mqtt_device_id = Plant-7\n"
+		"mqtt_period_s = 1\n";
 
 	TEST_ASSERT_EQUAL_INT(0, parse(text));
 	TEST_ASSERT_EQUAL_INT32(25000, cfg.core.cool_setpoint_mc);
@@ -109,6 +119,34 @@ static void test_full_valid_file_sets_every_key(void)
 	TEST_ASSERT_EQUAL_UINT32(600, cfg.fdd.ineffective_window_s);
 	TEST_ASSERT_EQUAL_INT32(300, cfg.fdd.ineffective_min_drop_mc);
 	TEST_ASSERT_EQUAL_UINT32(900, cfg.fdd.stuck_window_s);
+	TEST_ASSERT_EQUAL_UINT32(1, cfg.mqtt_enabled);
+	TEST_ASSERT_EQUAL_STRING("10.0.2.2", cfg.mqtt_host);
+	TEST_ASSERT_EQUAL_UINT16(18830, cfg.mqtt_port);
+	TEST_ASSERT_EQUAL_STRING("Plant-7", cfg.mqtt_device_id);
+	TEST_ASSERT_EQUAL_UINT32(1, cfg.mqtt_period_s);
+}
+
+/* Ext 3: the device id becomes part of topics and JSON, so only a safe character set is allowed. */
+static void test_mqtt_values_are_validated(void)
+{
+	expect_error("mqtt_device_id = hvac/01\n",
+		     "config:1: mqtt_device_id may contain only letters, digits and '-'");
+	expect_error("mqtt_device_id = hvac 01\n",
+		     "config:1: mqtt_device_id may contain only letters, digits and '-'");
+	expect_error("mqtt_device_id = \"hvac\"\n",
+		     "config:1: mqtt_device_id may contain only letters, digits and '-'");
+	expect_error("mqtt_device_id = 0123456789abcdef0123456789abcdef0\n",
+		     "config:1: value for 'mqtt_device_id' is longer than 32 characters");
+	TEST_ASSERT_EQUAL_INT(0, parse("mqtt_device_id = 0123456789abcdef0123456789abcdef\n"));
+	TEST_ASSERT_EQUAL_STRING("0123456789abcdef0123456789abcdef", cfg.mqtt_device_id);
+	expect_error("mqtt_period_s = 0\n",
+		     "config:1: value 0 for 'mqtt_period_s' is out of range 1..3600");
+	expect_error("mqtt_period_s = 3601\n",
+		     "config:1: value 3601 for 'mqtt_period_s' is out of range 1..3600");
+	expect_error("mqtt_port = 65536\n",
+		     "config:1: value 65536 for 'mqtt_port' is out of range 1..65535");
+	expect_error("mqtt_enabled = 2\n",
+		     "config:1: value 2 for 'mqtt_enabled' is out of range 0..1");
 }
 
 static void test_comments_blank_lines_and_whitespace_are_ignored(void)
@@ -296,6 +334,7 @@ int main(void)
 	UNITY_BEGIN();
 	RUN_TEST(test_empty_text_gives_all_defaults);
 	RUN_TEST(test_full_valid_file_sets_every_key);
+	RUN_TEST(test_mqtt_values_are_validated);
 	RUN_TEST(test_comments_blank_lines_and_whitespace_are_ignored);
 	RUN_TEST(test_unknown_key_is_an_error_with_its_line_number);
 	RUN_TEST(test_line_without_equals_sign_is_an_error);

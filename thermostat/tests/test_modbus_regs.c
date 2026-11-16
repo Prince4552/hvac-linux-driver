@@ -35,6 +35,14 @@ static void test_mc_to_cc_rounds_half_away_from_zero_and_clamps(void)
 	TEST_ASSERT_EQUAL_INT16(INT16_MIN + 1, mb_mc_to_cc(-400000));
 }
 
+/* Regression (found in Ext 3): negating INT32_MIN overflowed (undefined behavior under UBSan). */
+static void test_mc_to_cc_handles_the_int32_extremes(void)
+{
+	TEST_ASSERT_EQUAL_INT16(INT16_MIN + 1, mb_mc_to_cc(INT32_MIN));
+	TEST_ASSERT_EQUAL_INT16(INT16_MIN + 1, mb_mc_to_cc(INT32_MIN + 1));
+	TEST_ASSERT_EQUAL_INT16(INT16_MAX, mb_mc_to_cc(INT32_MAX));
+}
+
 static void test_no_reading_yet_publishes_minus_32768(void)
 {
 	mb_regs_publish(regs, &st);
@@ -105,6 +113,7 @@ int main(void)
 {
 	UNITY_BEGIN();
 	RUN_TEST(test_mc_to_cc_rounds_half_away_from_zero_and_clamps);
+	RUN_TEST(test_mc_to_cc_handles_the_int32_extremes);
 	RUN_TEST(test_no_reading_yet_publishes_minus_32768);
 	RUN_TEST(test_temperatures_are_twos_complement_centidegrees);
 	RUN_TEST(test_state_outputs_and_alarm_bits);

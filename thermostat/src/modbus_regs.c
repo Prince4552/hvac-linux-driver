@@ -12,7 +12,9 @@
 
 int16_t mb_mc_to_cc(int32_t mc)
 {
-	int32_t cc = mc >= 0 ? (mc + MC_PER_CC / 2) / MC_PER_CC : -((-mc + MC_PER_CC / 2) / MC_PER_CC);
+	/* 64-bit arithmetic: negating or adding to an int32 extreme would overflow. */
+	int64_t m = mc;
+	int64_t cc = m >= 0 ? (m + MC_PER_CC / 2) / MC_PER_CC : -((-m + MC_PER_CC / 2) / MC_PER_CC);
 
 	if (cc > INT16_MAX)
 		return INT16_MAX;
