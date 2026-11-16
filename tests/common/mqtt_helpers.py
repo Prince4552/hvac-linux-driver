@@ -91,9 +91,12 @@ class Subscriber:
         return [m.payload for m in self.messages(topic)]
 
     def close(self) -> None:
+        """SIGKILL, not SIGTERM: mosquitto_sub's SIGTERM handler calls mosquitto_disconnect_v5(),
+        which takes library locks and can deadlock (it hung a CI run; D-029 addendum). Every
+        message is already in the output file (mosquitto_sub flushes after each one)."""
         if self.proc.poll() is None:
-            self.proc.terminate()
-            self.proc.wait()
+            self.proc.kill()
+        self.proc.wait(timeout=10)
         self.out.close()
 
 

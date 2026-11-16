@@ -428,3 +428,10 @@ Format (newest at the bottom):
      (target <= 15); `control_loop_jitter_broker_down_ms` (target <= 100).
 - Reason: simplest reading of the plan that keeps control independent of the network.
 - Consequences: `hvacd` links libmosquitto; the Buildroot image gains mosquitto (broker, library, clients).
+  (Addendum after the first CI run, 2026-11-16: the host job hung in pytest until the 60-minute job
+  timeout, with `mosquitto` and `mosquitto_sub` still alive. `mosquitto_sub`'s SIGTERM handler
+  (client/sub_client.c, the same in 2.0.18 on CI and 2.0.22 locally) calls `mosquitto_disconnect_v5()`
+  inside the signal handler. That function takes library mutexes, which is not async-signal-safe, so
+  a badly timed SIGTERM can deadlock the subscriber, and the test helper waited for it without a
+  limit. Fix: the helper ends `mosquitto_sub` with SIGKILL (its output is already flushed) and waits
+  at most 10 s. hvacd is not affected; it only sets a flag in its signal handler.)
