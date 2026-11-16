@@ -27,23 +27,14 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 
 ## Current phase
 
-Phase: Ext 4 (Control core on FreeRTOS), then release v1.1.0
+Phase: none. All phases (0-7) and extensions (1-4) are done; `v1.1.0` is released.
 
-Ext 3 follow-up: its first CI run (43802091219) was cancelled at the 60-minute host-job timeout. Cause:
-`mosquitto_sub` can deadlock in its own SIGTERM handler, and the test helper waited without a limit
-(D-029 addendum). The same hang then hit one local guest run. Fix: SIGKILL plus a bounded wait in
-`tests/common/mqtt_helpers.py`; to be committed as `ci: ...` and pushed.
-
-Ext 4 task checklist:
-
-- [x] D-030; `scripts/fetch_freertos.sh` (V11.3.3, commit-pinned)
-- [x] `rtos/` CMake project: FreeRTOSConfig.h, main.c, plant/control/logger tasks, static allocation
-- [x] Shared trace writer `thermostat/sim/sil_trace.c`; host `sil trace`
-- [x] Equivalence test in `make test-host` (`scripts/check_rtos.py`): byte-identical, 0 send failures
-- [x] Metrics; learning note; README, TECHNICAL_REPORT 8.4, VERSIONS, THIRD_PARTY
-- [x] Gate `make test-all`, `make metrics`
-- [ ] Commits `ci: ...` and `ext 4: ...`, tag `ext-4`, push, verify, CI
-- [ ] Release `v1.1.0`
+Notes for a future session:
+- Ext 3's first CI run (43802091219) was cancelled at the 60-minute host timeout by a `mosquitto_sub`
+  deadlock in the test helper; fixed in `ci: end mosquitto_sub with SIGKILL in test helpers` (D-029
+  addendum). CI has been green since.
+- `hvacd --version` still prints 1.0.0 (not bumped for v1.1.0).
+- On the FreeRTOS POSIX port, stack high-water marks do not show real stack use (D-030).
 
 ## Blockers
 
@@ -80,7 +71,10 @@ log file path, what you need from the user.)
 ## Publishing
 
 - Repository URL: https://github.com/Prince4552/hvac-linux-driver
-- Release: `v1.0.0` (at `phase-7`), https://github.com/Prince4552/hvac-linux-driver/releases/tag/v1.0.0
-- Last pushed commit: `e946bc4` (ext 2), verified with `scripts/verify_push.sh`
-- Tags on remote: phase-0 .. phase-7, ext-1, ext-2, v1.0.0
-- Last CI run and result: `phase 7` commit, run 43760149090, host + qemu success; `ext 1` runs 43799393231 (main) and 43799401402 (tag): success; `ext 2` run 43800200090: pending
+- Releases: `v1.0.0` (at `phase-7`), `v1.1.0` (at `ext-4`):
+  https://github.com/Prince4552/hvac-linux-driver/releases
+- Last pushed commit: `958bbe9` (ext 4), verified with `scripts/verify_push.sh`
+- Tags on remote: phase-0 .. phase-7, ext-1 .. ext-4, v1.0.0, v1.1.0
+- CI on main: phase 7 run 43760149090, ext 1 run 43799393231, ext 2 run 43800200090, ext 4 run
+  43810063275 (includes the ext 3 code and its CI fix): all host + qemu success. Ext 3 run 43802091219:
+  cancelled (hang fixed in the `ci:` commit).
