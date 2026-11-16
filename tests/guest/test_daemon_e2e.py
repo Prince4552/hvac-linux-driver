@@ -116,4 +116,4 @@ def test_bad_config_exits_one_with_clear_message(tmp_path: Path) -> None:
 
 def test_version_flag() -> None:
     out = subprocess.run([HVACD, "--version"], capture_output=True, text=True, timeout=20)
-    assert out.returncode == 0 and out.stdout.strip() == "hvacd 1.0.0"
+    assert out.returncode == 0 and out.stdout.strip() == "hvacd 1.1.0"

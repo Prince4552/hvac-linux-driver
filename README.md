@@ -62,8 +62,8 @@ Key numbers from `make test-all`, `make mutation` and `make metrics`. All metric
 
 | What | Result | Target |
 | --- | --- | --- |
-| In-guest tests (driver, platform, daemon end to end) | 98 passed, 0 failed, 0 skipped | 0 failed |
-| Host tests (unit x3 builds, integration, simulation) | 76 passed, 0 failed | 0 failed |
+| In-guest tests (driver, platform, daemon end to end) | 106 passed, 0 failed, 0 skipped | 0 failed |
+| Host tests (unit x3 builds, integration, simulation) | 107 passed, 0 failed | 0 failed |
 | Kernel memory errors (KASAN), leaks (kmemleak), lock bugs (lockdep) | 0 / 0 / 0 | 0 |
 | Driver load/unload cycles without a problem | 500 | >= 500 |
 | Wrong reads with 8 threads reading at once (8000 reads) | 0 | 0 |
@@ -73,7 +73,7 @@ Key numbers from `make test-all`, `make mutation` and `make metrics`. All metric
 | User-space sanitizer and Valgrind errors, leaked bytes | 0 / 0 / 0 | 0 |
 | Simulated comfort, all three 24 h scenarios | 100 % | >= 98 % |
 | Compressor starts per hour, hot day: hvac_core vs naive thermostat | 2.83 vs 592 | fewer |
-| Sensor loss -> alarm visible over Modbus | 0.12 s | <= 1.6 s |
+| Sensor loss -> alarm visible over Modbus | 0.1 s | <= 1.6 s |
 
 ![Simulated hot day: hvac_core vs a naive thermostat](docs/images/sil_hot_day.png)
 

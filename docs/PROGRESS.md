@@ -33,7 +33,9 @@ Notes for a future session:
 - Ext 3's first CI run (43802091219) was cancelled at the 60-minute host timeout by a `mosquitto_sub`
   deadlock in the test helper; fixed in `ci: end mosquitto_sub with SIGKILL in test helpers` (D-029
   addendum). CI has been green since.
-- `hvacd --version` still prints 1.0.0 (not bumped for v1.1.0).
+- `hvacd --version` prints 1.1.0 (bumped after the v1.1.0 tag; README and technical report now use the
+  v1.1.0 metrics). Host tests 107/107 after the bump; the guest version test was updated but not yet
+  rerun in QEMU locally (CI runs it on push).
 - On the FreeRTOS POSIX port, stack high-water marks do not show real stack use (D-030).
 
 ## Blockers

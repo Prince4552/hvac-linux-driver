@@ -27,7 +27,7 @@
 #include "telemetry_mqtt.h"
 #include "watchdog.h"
 
-#define HVACD_VERSION "1.0.0"
+#define HVACD_VERSION "1.1.0"
 #define EXIT_OK 0
 #define EXIT_STARTUP 1
 #define EXIT_FATAL 2
