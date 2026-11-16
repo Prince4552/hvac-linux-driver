@@ -21,6 +21,48 @@
    "target": "report",
    "meaning": "Average time from fault to diagnostic bit",
    "source": "ext 2, sil fdd"
+  },
+  "rtos_trace_match_pct": {
+   "value": 100.0,
+   "unit": "%",
+   "target": "== 100",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "FreeRTOS trace identical to the host simulator's (hot_day, 2 h, seed 1)"
+  },
+  "rtos_queue_send_failures": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "Queue sends that timed out in the FreeRTOS port"
+  },
+  "rtos_min_free_heap_bytes": {
+   "value": 65536,
+   "unit": "bytes",
+   "target": "report",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "Lowest free FreeRTOS kernel heap (of 65536; 0 allocations)"
+  },
+  "rtos_stack_high_water_words_plant": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "Unused words of the plant task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)"
+  },
+  "rtos_stack_high_water_words_control": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "Unused words of the control task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)"
+  },
+  "rtos_stack_high_water_words_logger": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "source": "ext 4, hvac_rtos",
+   "meaning": "Unused words of the logger task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)"
   }
  }
 }

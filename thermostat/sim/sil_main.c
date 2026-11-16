@@ -5,6 +5,7 @@
  * 10 s plus control-quality metrics. Usage: sil OUT_DIR [SEED]
  * Writes OUT_DIR/<scenario>_<controller>.csv and OUT_DIR/sil_metrics.json.
  * "sil fdd OUT_DIR" runs the fault-detection experiments instead (Ext 2, sil_fdd.c).
+ * "sil trace OUT.csv" writes the per-second trace that the FreeRTOS port must match (Ext 4).
  */
 #include <errno.h>
 #include <stdio.h>
@@ -16,6 +17,7 @@
 #include "room_model.h"
 #include "sil_fdd.h"
 #include "sil_metrics.h"
+#include "sil_trace.h"
 
 #define CSV_EVERY_S 10u
 #define MS_PER_S 1000u
@@ -154,6 +156,39 @@ static int run_all(const char *out_dir, uint32_t seed)
 	return ret;
 }
 
+/* Ext 4: the reference trace for the FreeRTOS equivalence test (settings in sil_trace.h). */
+static int run_trace(const char *path)
+{
+	const room_scenario_t *sc = room_find_scenario(SIL_TRACE_SCENARIO);
+	hvac_config_t cfg = {0};
+	hvac_ctx_t core = {0};
+	hvac_outputs_t out = {0};
+	room_t room = {0};
+	FILE *f = NULL;
+	int ret = 0;
+
+	hvac_config_set_defaults(&cfg);
+	if (sc == NULL || hvac_core_init(&core, &cfg) != 0)
+		return -EINVAL;
+	room_init(&room, sc, SIL_TRACE_SEED);
+	f = fopen(path, "w");
+	if (f == NULL)
+		return -errno;
+	ret = sil_trace_header(f);
+	for (uint32_t t = 0; t < SIL_TRACE_SECONDS && ret == 0; t++) {
+		int32_t meas_mc = room_sensor_read_mc(&room);
+		hvac_input_t in = { .read_ok = true, .temp_mc = meas_mc,
+				    .now_ms = (uint64_t)t * MS_PER_S };
+		hvac_state_t state = hvac_core_step(&core, &in, &out);
+
+		ret = sil_trace_row(f, t, meas_mc, state, &out);
+		room_step(&room, t, out.compressor, out.heater);
+	}
+	if (fclose(f) != 0 && ret == 0)
+		ret = -EIO;
+	return ret;
+}
+
 static int parse_seed(const char *text, uint32_t *seed)
 {
 	char *end = NULL;
@@ -176,6 +211,12 @@ int main(int argc, char **argv)
 		ret = sil_fdd_run_all(argv[2]);
 		if (ret != 0)
 			fprintf(stderr, "sil fdd: failed: %s\n", strerror(-ret));
+		return ret == 0 ? 0 : 1;
+	}
+	if (argc == 3 && strcmp(argv[1], "trace") == 0) {
+		ret = run_trace(argv[2]);
+		if (ret != 0)
+			fprintf(stderr, "sil trace: failed: %s\n", strerror(-ret));
 		return ret == 0 ? 0 : 1;
 	}
 	if (argc < 2 || argc > 3 || (argc == 3 && parse_seed(argv[2], &seed) != 0)) {

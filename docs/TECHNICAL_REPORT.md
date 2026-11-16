@@ -294,6 +294,30 @@ sanitizer build failed at once. It now computes in 64 bits, with a regression te
 Limitations: a host *name* needs a blocking DNS lookup (the board uses an IP address); messages are
 not stored while offline; the demo broker has no TLS or passwords.
 
+### 8.4 The same control core on FreeRTOS (Ext 4)
+
+FreeRTOS is the most widely used RTOS (real-time operating system) for microcontrollers. The
+unchanged `hvac_core.c` runs in three FreeRTOS tasks on the official POSIX simulator port
+(FreeRTOS-Kernel V11.3.3), which runs FreeRTOS as an ordinary Linux program:
+
+| Task | Priority | Job |
+| --- | --- | --- |
+| control | 3 (highest) | Waits for a reading, calls `hvac_core_step()`, sends the outputs back |
+| plant | 2 | Room model and sensor; one simulated second per 1 ms tick, paced by `vTaskDelayUntil()` |
+| logger | 1 (lowest) | Writes the trace; ends the scheduler after the last row |
+
+Tasks and queues are allocated statically (`xTaskCreateStatic()`, `xQueueCreateStatic()`). The plant
+task waits for the controller's answer before it advances the room (lockstep), and simulated time
+travels inside the messages, so the run is deterministic. The equivalence test runs `hot_day` for
+2 simulated hours with seed 1 on both the Linux simulator and FreeRTOS. Both write their per-second
+trace with the same function, and the two 7,201-line files are **byte-identical** (100 %), with
+0 queue send failures. The kernel heap was never used (0 allocations).
+
+Two honest caveats (D-030). On the POSIX port each task runs on its own Linux thread stack, so the
+FreeRTOS stack high-water marks (4091 of 4096 words free) do not show real stack use as they would on
+a microcontroller. Sanitizers and Valgrind are not run on this binary, because the port suspends
+threads with signals; the same core is checked by them in the Linux build.
+
 ## 9. How to reproduce
 
 | Command | What it does | Time |
@@ -360,9 +384,13 @@ are in `VERSIONS.md` and `THIRD_PARTY.md`.
 | KUnit | The Linux kernel's unit-test framework |
 | lockdep | Kernel lock-order checker that predicts deadlocks |
 | Modbus TCP | A simple industrial protocol for reading and writing 16-bit registers over a network |
+| MQTT | Message Queuing Telemetry Transport: a light publish/subscribe protocol through a broker, used for device telemetry |
 | Mutation testing | Inserting bugs on purpose to check that the tests catch them |
 | Mutex | A lock that lets only one thread into a section of code at a time |
+| QoS (MQTT) | Quality of service: 0 at most once, 1 at least once, 2 exactly once |
+| Queue (RTOS) | A FreeRTOS object that copies messages from one task to another; a task waiting on it uses no CPU |
 | QEMU | A program that emulates a whole computer |
+| RTOS / FreeRTOS | Real-time operating system: runs the most important ready task first; FreeRTOS is the most common one for microcontrollers |
 | Register | A small numbered storage location inside a chip |
 | RSS | Resident set size: memory a program actually occupies |
 | Sanitizer | Compiler-added runtime checks for memory errors and undefined behaviour |
@@ -370,6 +398,7 @@ are in `VERSIONS.md` and `THIRD_PARTY.md`.
 | Setpoint | The target temperature the controller aims for |
 | SIL | Software in the loop: real control code running against a simulated plant |
 | sysfs | A kernel file system where drivers publish small text files |
+| Task (RTOS) | An endless function with its own stack and priority, scheduled by the RTOS |
 | Two's complement | The standard binary encoding of negative numbers |
 | Valgrind | A tool that runs a program and reports memory errors and leaks |
 | Yocto | A widely used industrial build system for embedded Linux |

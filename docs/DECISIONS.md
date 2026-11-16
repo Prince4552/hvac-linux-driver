@@ -435,3 +435,43 @@ Format (newest at the bottom):
   a badly timed SIGTERM can deadlock the subscriber, and the test helper waited for it without a
   limit. Fix: the helper ends `mosquitto_sub` with SIGKILL (its output is already flushed) and waits
   at most 10 s. hvacd is not affected; it only sets a flag in its signal handler.)
+
+## D-030: FreeRTOS port details (Ext 4)
+- Date / phase: 2026-11-16, Ext 4
+- Context: the plan fixes the port, the task split, the lockstep design and the equivalence test, but
+  not the version, the time source, priorities, queue sizes or how to end the run.
+- Decision:
+  1. FreeRTOS-Kernel **V11.3.3** (newest release on 2026-11-16), tag commit
+     `89592801dd8b73329a7583719b7e3567b50910e5`. `scripts/fetch_freertos.sh` does a shallow `git clone`
+     of the tag into `.cache/FreeRTOS-Kernel-V11.3.3` and fails unless `HEAD` is exactly that commit
+     (a commit pin is stronger than a GitHub archive checksum, whose bytes GitHub does not guarantee).
+  2. Ending the run: the pinned POSIX port implements `vPortEndScheduler()`, so the logger task calls
+     `vTaskEndScheduler()` after writing the last trace row; `main()` then prints the metrics and returns.
+  3. Time: the plant task's step counter is the simulated clock (it travels in the queue message), so
+     the trace never depends on how fast the host runs. `vTaskDelayUntil()` with a 1-tick period paces
+     the plant task; `configTICK_RATE_HZ = 1000`, so 1 tick = 1 ms real = 1 simulated second.
+  4. Tasks and priorities: control 3 (highest; reacts at once to a reading), plant 2, logger 1 (lowest,
+     as the plan says). Queues: reading (length 1), outputs (length 1), log (length 32). Every send uses a
+     100-tick timeout; a timeout counts as a failure (`rtos_queue_send_failures`, target 0).
+  5. Trace: hot_day, 7200 s, seed 1, default control configuration. One shared function
+     (`thermostat/sim/sil_trace.c`) writes `t_s,temp_meas_mc,state,compressor,heater` for both the host
+     simulator (`sil trace OUT.csv`) and the FreeRTOS logger task. Order per second in both: read
+     sensor, control step, write row, advance room.
+  6. Allocation: application tasks, queues and the idle task are static; timers are off
+     (`configUSE_TIMERS 0`); the kernel heap is `heap_4` with 64 KiB. heap_4 only sets up its
+     bookkeeping on the first allocation, and this program makes none, so `rtos_min_free_heap_bytes`
+     is the whole heap when `rtos_heap_allocations` is 0 (both are reported). Stack: 4096 words per task.
+     Measured finding (first run): the pinned POSIX port creates each task's pthread with default
+     attributes (`pxPortInitialiseStack()` in `port.c`), so the task really runs on its own Linux
+     thread stack. The FreeRTOS stack array only holds the port's `Thread_t` record. The
+     high-water mark is still reported as the plan asks, but on this simulator it does **not** show
+     real stack use; on a microcontroller port it would.
+  7. Build: `rtos/` is its own CMake project. Our files use the project's strict warnings with
+     `-Werror`; the FreeRTOS kernel and port are a separate library with default flags, and their headers
+     are included as system headers. cppcheck also covers `rtos/`. Sanitizers and Valgrind are not run on
+     `hvac_rtos`: the POSIX port suspends threads with signals, which those tools do not model.
+  8. Metrics: `rtos_trace_match_pct` (== 100; share of identical lines, 100 only if byte-identical),
+     `rtos_stack_high_water_words_<task>` (report), `rtos_min_free_heap_bytes` (report),
+     `rtos_queue_send_failures` (== 0). `make test-host` runs the port and `scripts/check_rtos.py`.
+- Reason: deterministic, simplest reading of the plan.
+- Consequences: `make test-host` needs network access once to clone FreeRTOS (cached in `.cache/`).

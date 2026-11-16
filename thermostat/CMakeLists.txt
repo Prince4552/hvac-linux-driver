@@ -65,7 +65,7 @@ if(HVAC_BUILD_TESTS)
 
 	# Software-in-the-loop room simulator.
 	add_executable(sil sim/sil_main.c sim/room_model.c sim/baseline_controller.c
-		sim/sil_metrics.c sim/sil_fdd.c)
+		sim/sil_metrics.c sim/sil_fdd.c sim/sil_trace.c)
 	target_include_directories(sil PRIVATE sim)
 	target_link_libraries(sil PRIVATE hvac_core)
 	target_compile_options(sil PRIVATE ${HVAC_WARNINGS})

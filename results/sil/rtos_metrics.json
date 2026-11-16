@@ -1,0 +1,5 @@
+{"schema": 1, "scenario": "hot_day", "seconds": 7200, "seed": 1,
+ "rtos_queue_send_failures": 0, "rtos_min_free_heap_bytes": 65536,
+ "rtos_heap_allocations": 0, "rtos_heap_total_bytes": 65536,
+ "rtos_stack_high_water_words": {"plant": 4091, "control": 4091, "logger": 4091},
+ "rtos_stack_words": 4096}

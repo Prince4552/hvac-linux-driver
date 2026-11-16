@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_utc": "2026-11-16T04:06:05Z",
- "git_commit": "e946bc4",
+ "generated_utc": "2026-11-16T05:24:21Z",
+ "git_commit": "20526fa",
  "metrics": {
   "guest_tests_passed": {
    "value": 106,
@@ -84,7 +84,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_median_us": {
-   "value": 1125,
+   "value": 1144,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -92,7 +92,7 @@
    "source": "phase 4, test_driver_robustness.py / test_memory.py"
   },
   "driver_read_latency_p99_us": {
-   "value": 3985,
+   "value": 4110,
    "unit": "us",
    "target": "report",
    "pass": true,
@@ -276,7 +276,7 @@
    "source": "phase 5, sil"
   },
   "modbus_roundtrip_median_ms": {
-   "value": 1.99,
+   "value": 2.0,
    "unit": "ms",
    "target": "report",
    "pass": true,
@@ -284,7 +284,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "fault_detection_latency_s": {
-   "value": 0.09,
+   "value": 0.1,
    "unit": "s",
    "target": "<= 1.6",
    "pass": true,
@@ -292,7 +292,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "hvacd_rss_kb": {
-   "value": 1472,
+   "value": 1636,
    "unit": "kB",
    "target": "report",
    "pass": true,
@@ -308,7 +308,7 @@
    "source": "phase 6, test_daemon_e2e.py"
   },
   "guest_boot_to_tests_s": {
-   "value": 8.6,
+   "value": 8.4,
    "unit": "s",
    "target": "report",
    "pass": true,
@@ -332,7 +332,7 @@
    "source": "build.sh"
   },
   "control_loop_jitter_broker_down_ms": {
-   "value": 4,
+   "value": 3,
    "unit": "ms",
    "target": "<= 100",
    "pass": true,
@@ -372,15 +372,63 @@
    "source": "extension"
   },
   "mqtt_reconnect_s": {
-   "value": 4.78,
+   "value": 4.74,
    "unit": "s",
    "target": "<= 15",
    "pass": true,
    "meaning": "Time from broker restart until hvacd is connected again",
    "source": "extension"
   },
+  "rtos_min_free_heap_bytes": {
+   "value": 65536,
+   "unit": "bytes",
+   "target": "report",
+   "pass": true,
+   "meaning": "Lowest free FreeRTOS kernel heap (of 65536; 0 allocations)",
+   "source": "ext 4, hvac_rtos"
+  },
+  "rtos_queue_send_failures": {
+   "value": 0,
+   "unit": "count",
+   "target": "== 0",
+   "pass": true,
+   "meaning": "Queue sends that timed out in the FreeRTOS port",
+   "source": "ext 4, hvac_rtos"
+  },
+  "rtos_stack_high_water_words_control": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "pass": true,
+   "meaning": "Unused words of the control task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)",
+   "source": "ext 4, hvac_rtos"
+  },
+  "rtos_stack_high_water_words_logger": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "pass": true,
+   "meaning": "Unused words of the logger task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)",
+   "source": "ext 4, hvac_rtos"
+  },
+  "rtos_stack_high_water_words_plant": {
+   "value": 4091,
+   "unit": "words",
+   "target": "report",
+   "pass": true,
+   "meaning": "Unused words of the plant task's FreeRTOS stack (POSIX simulator: covers only the FreeRTOS stack area, not the Linux thread's stack; D-030)",
+   "source": "ext 4, hvac_rtos"
+  },
+  "rtos_trace_match_pct": {
+   "value": 100.0,
+   "unit": "%",
+   "target": "== 100",
+   "pass": true,
+   "meaning": "FreeRTOS trace identical to the host simulator's (hot_day, 2 h, seed 1)",
+   "source": "ext 4, hvac_rtos"
+  },
   "watchdog_trigger_latency_s": {
-   "value": 1.97,
+   "value": 1.99,
    "unit": "s",
    "target": "<= 5",
    "pass": true,

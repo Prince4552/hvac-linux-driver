@@ -21,26 +21,29 @@ Status values: `not started`, `in progress`, `blocked`, `done`.
 | Ext 1 | Watchdog supervision | done | `make test-all`: host 81/81, guest 101/101, 0 skipped | `ext 1: Watchdog supervision` / `ext-1` |
 | Ext 2 | Fault detection and diagnostics | done | `make test-all`: host 93/93 (82 unit x3 + 11 integration), guest 101/101, 0 skipped; 45/45 metrics | `ext 2: Fault detection and diagnostics` / `ext-2` |
 | Ext 3 | MQTT telemetry | done | `make test-all`: host 107/107 (91 unit x3 + 16 integration), guest 106/106, 0 skipped; 48/48 metrics | `ext 3: MQTT telemetry` / `ext-3` |
-| Ext 4 | Control core on FreeRTOS (v1.1.0) | not started | | |
+| Ext 4 | Control core on FreeRTOS (v1.1.0) | done | `make test-all`: host 107/107 + RTOS trace 100 %, guest 106/106, 0 skipped; 54/54 metrics | `ext 4: Control core on FreeRTOS` / `ext-4` |
 
 "Gate result" example: `make test-all: host 42/42, guest 57/57, 0 skipped`.
 
 ## Current phase
 
-Phase: Ext 3 (MQTT telemetry)
+Phase: Ext 4 (Control core on FreeRTOS), then release v1.1.0
 
-Ext 3 task checklist:
+Ext 3 follow-up: its first CI run (43802091219) was cancelled at the 60-minute host-job timeout. Cause:
+`mosquitto_sub` can deadlock in its own SIGTERM handler, and the test helper waited without a limit
+(D-029 addendum). The same hang then hit one local guest run. Fix: SIGKILL plus a bounded wait in
+`tests/common/mqtt_helpers.py`; to be committed as `ci: ...` and pushed.
 
-- [x] D-029 (file split, payload, connection mechanics, loop-period measurement, metrics)
-- [x] `telemetry_json.c` (pure formatter) + `telemetry_mqtt.c` (non-blocking libmosquitto client)
-- [x] Topics, QoS 1, retained online, last-will offline; config keys with validation
-- [x] Buildroot: mosquitto (broker, clients, library); board config sends to the local broker
-- [x] Unit tests (formatter, config); host tests (broker on 18830, Valgrind with MQTT); guest tests
-- [x] Bug found and fixed: `mb_mc_to_cc()` overflow at int32 limits (regression test added)
-- [x] Gate `make test-all`, `make metrics` (`mqtt_messages_received_ratio`, `mqtt_reconnect_s`,
-      `control_loop_jitter_broker_down_ms`)
-- [x] Learning note results, README, TECHNICAL_REPORT section 8.3
-- [ ] Commit `ext 3: ...`, tag `ext-3`, push, verify, CI
+Ext 4 task checklist:
+
+- [x] D-030; `scripts/fetch_freertos.sh` (V11.3.3, commit-pinned)
+- [x] `rtos/` CMake project: FreeRTOSConfig.h, main.c, plant/control/logger tasks, static allocation
+- [x] Shared trace writer `thermostat/sim/sil_trace.c`; host `sil trace`
+- [x] Equivalence test in `make test-host` (`scripts/check_rtos.py`): byte-identical, 0 send failures
+- [x] Metrics; learning note; README, TECHNICAL_REPORT 8.4, VERSIONS, THIRD_PARTY
+- [x] Gate `make test-all`, `make metrics`
+- [ ] Commits `ci: ...` and `ext 4: ...`, tag `ext-4`, push, verify, CI
+- [ ] Release `v1.1.0`
 
 ## Blockers
 
@@ -71,6 +74,8 @@ log file path, what you need from the user.)
   lines / 93.5 % branches; host 93, guest 101; 45/45 metrics on target.
 - Ext 3: MQTT received ratio 1.0; control-loop jitter with broker down 4 ms; reconnect 4.78 s;
   telemetry_json.c 96.2 % lines / 94.4 % branches; host 107, guest 106; 48/48 metrics on target.
+- Ext 4: FreeRTOS trace byte-identical (7,201 lines); 0 queue send failures; 0 heap allocations;
+  run 8 s for 7,200 ticks; 54/54 metrics on target.
 
 ## Publishing
 

@@ -88,6 +88,7 @@ wears it out.*
 | Ext 1: watchdog | `hvacd` kicks `/dev/watchdog` after each control step; magic close on shutdown | frozen daemon detected in 1.94 s (timeout 2 s) |
 | Ext 2: fault detection | Two rules (cooling ineffective, sensor stuck) published in Modbus register 8 | 5/5 injected faults detected (26.4 min average), 0 false alarms in 15 healthy simulated days |
 | Ext 3: MQTT telemetry | JSON telemetry every `mqtt_period_s`, retained online/offline status with last will, never blocks control | loop period changed by 4 ms with the broker down; reconnect in 4.78 s; 100 % of messages received |
+| Ext 4: FreeRTOS port | The unchanged control core in three FreeRTOS tasks (plant, control, logger) with static queues | 2-hour trace byte-identical to the Linux simulator (100 %), 0 queue send failures |
 
 ## Repository map
 
@@ -96,6 +97,7 @@ wears it out.*
 | `driver/` | The `hvac_temp` kernel module (GPL-2.0-only) and its KUnit tests |
 | `examples/hello_module/` | A minimal kernel module for learning |
 | `thermostat/` | Control core, configuration parser, `hvacd` daemon, simulator, Unity unit tests |
+| `rtos/` | FreeRTOS port (Ext 4): the same control core in FreeRTOS tasks, on the POSIX simulator port |
 | `br2-external/` | Buildroot customization: defconfig, kernel config fragment, init scripts, packages |
 | `tests/` | Guest tests (run inside QEMU), host tests, shared Modbus client, mutation patches |
 | `scripts/` | Every build, test and report step (the Makefile only calls these) |

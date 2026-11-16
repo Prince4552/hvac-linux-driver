@@ -18,8 +18,9 @@ into `.cache/` or installed on the host. Exact versions and checksums are in `VE
 | Python 3 / pytest (guest) | Guest test runner | 3.14 / 9.0.2 | PSF-2.0 / MIT | no (`.cache/`) |
 | libmodbus | Modbus TCP server in `hvacd` (guest 3.1.11 via Buildroot; host package for host tests) | 3.1.11 | LGPL-2.1-or-later (dynamically linked) | no |
 | Eclipse Mosquitto | MQTT broker, `mosquitto_sub`, and libmosquitto in `hvacd` (Ext 3; guest via Buildroot, host package for host tests) | 2.0.22 | EPL-2.0 or EDL-1.0 (dynamically linked) | no |
+| FreeRTOS-Kernel | RTOS kernel and POSIX simulator port for `rtos/` (Ext 4; cloned into `.cache/`, never copied) | V11.3.3 | MIT | no (`.cache/`) |
 | Unity | C unit-test framework | v2.7.0 | MIT | **yes**, `thermostat/third_party/unity/` (unchanged copy + license) |
 | cppcheck, Valgrind, GCC sanitizers, gcov | Host checks | host packages | GPL (tools only, nothing linked into our code) | no (host) |
 | QEMU | Emulates the ARM64 board | host package `qemu-system-arm` (10.2.1 on the development host) | GPL-2.0 | no (host) |
 
-Extensions add rows when they bring in new components (FreeRTOS-Kernel in Ext 4).
+Extensions add a row for every new component they bring in.

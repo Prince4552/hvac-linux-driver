@@ -55,9 +55,11 @@ step "lint"
 step "cppcheck"
 cpp_log="${LOGS}/cppcheck.log"
 cpp_rc=0
-cppcheck --enable=warning,style,performance,portability --std=c11 --error-exitcode=1 -q \
-	-I "${SRC}/include" -i "${SRC}/third_party" --suppress=missingIncludeSystem \
-	--template='{file}:{line}: {severity}: {id}: {message}' "${SRC}" > "${cpp_log}" 2>&1 || cpp_rc=$?
+# --inline-suppr: a suppression is allowed only in a comment that gives its reason in the source.
+cppcheck --enable=warning,style,performance,portability --std=c11 --error-exitcode=1 -q --inline-suppr \
+	-I "${SRC}/include" -I "${SRC}/sim" -i "${SRC}/third_party" --suppress=missingIncludeSystem \
+	--template='{file}:{line}: {severity}: {id}: {message}' "${SRC}" "${ROOT}/rtos" \
+	> "${cpp_log}" 2>&1 || cpp_rc=$?
 cpp_findings="$(grep -c ': \(error\|warning\|style\|performance\|portability\): ' "${cpp_log}" || true)"
 echo "{\"schema\": 1, \"cppcheck_findings\": ${cpp_findings}}" > "${OUT}/cppcheck.json"
 if [[ "${cpp_rc}" -ne 0 || "${cpp_findings}" -ne 0 ]]; then
@@ -119,6 +121,18 @@ step "software-in-the-loop simulation"
 step "fault detection experiments (Ext 2)"
 "${BUILD}/thermostat/sil" fdd "${ROOT}/results/sil" > "${LOGS}/sil-fdd.log"
 "${PY}" "${ROOT}/scripts/check_fdd.py" "${ROOT}/results/sil/fdd_metrics.json" "${OUT}/extensions.json"
+
+step "control core on FreeRTOS: equivalence test (Ext 4)"
+# Sanitizers and Valgrind are not run on hvac_rtos: the POSIX port suspends threads with signals (D-030).
+"${ROOT}/scripts/fetch_freertos.sh"
+cmake -S "${ROOT}/rtos" -B "${BUILD}/rtos" -DCMAKE_BUILD_TYPE=Debug > "${LOGS}/rtos-cmake.log" 2>&1 ||
+	{ cat "${LOGS}/rtos-cmake.log"; exit 1; }
+cmake --build "${BUILD}/rtos" -j "$(nproc)" > "${LOGS}/rtos-build.log" 2>&1 ||
+	{ cat "${LOGS}/rtos-build.log"; exit 1; }
+"${BUILD}/thermostat/sil" trace "${ROOT}/results/tmp/trace_host.csv"
+"${BUILD}/rtos/hvac_rtos" "${ROOT}/results/tmp/trace_rtos.csv" "${ROOT}/results/sil/rtos_metrics.json"
+"${PY}" "${ROOT}/scripts/check_rtos.py" "${ROOT}/results/tmp/trace_host.csv" \
+	"${ROOT}/results/tmp/trace_rtos.csv" "${ROOT}/results/sil/rtos_metrics.json" "${OUT}/extensions.json"
 
 step "daemon integration tests (pytest, fake sysfs, Modbus, Valgrind)"
 pytest_rc=0
